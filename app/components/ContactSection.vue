@@ -24,7 +24,7 @@ function handleSubmit() {
           of gewoon een vraag hebt — ik reageer binnen 24 uur.
         </p>
         <p>Gebaseerd in Brugge, beschikbaar remote en on-site.</p>
-        <a href="mailto:niels@example.com" class="contact-mail">niels@example.com</a>
+        <a href="mailto:niels@nielsm.dev" class="contact-mail">niels@nielsm.dev</a>
       </div>
 
       <div class="reveal">

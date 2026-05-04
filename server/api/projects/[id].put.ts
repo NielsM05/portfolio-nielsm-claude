@@ -1,14 +1,7 @@
 import { readData, writeData } from '../../utils/db'
 import { requireAuth } from '../../utils/auth'
 
-interface Project {
-  id: number
-  category: string
-  title: string
-  description: string
-  link: string
-  linkLabel: string
-}
+interface Project { id: number; [key: string]: unknown }
 
 export default defineEventHandler(async (event) => {
   requireAuth(event)

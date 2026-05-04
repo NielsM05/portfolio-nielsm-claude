@@ -4,7 +4,16 @@
     "category": "Testing",
     "title": "Dit is een test ",
     "description": "Dit is de beschrijving van de testpost",
-    "link": "https://youtube.com",
-    "linkLabel": "Lees meer →"
+    "content": "Dit is een gedetailleerde beschrijving lol",
+    "externalLink": "https://youtube.com",
+    "photos": [
+      "/uploads/1777892031374-g0e9p4nnyid.png"
+    ],
+    "collaborators": [
+      {
+        "name": "Milan Beernaert",
+        "linkedinUrl": "linkedin/milanb"
+      }
+    ]
   }
 ]

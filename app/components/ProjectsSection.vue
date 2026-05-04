@@ -4,8 +4,6 @@ interface Project {
   category: string
   title: string
   description: string
-  link: string
-  linkLabel: string
 }
 
 const { data: projects } = await useFetch<Project[]>('/api/projects')
@@ -28,7 +26,7 @@ const { data: projects } = await useFetch<Project[]>('/api/projects')
           <div class="proj-h">{{ project.title }}</div>
           <p class="proj-p">{{ project.description }}</p>
         </div>
-        <a :href="project.link" class="proj-link">{{ project.linkLabel }}</a>
+        <NuxtLink :to="`/projects/${project.id}`" class="proj-link">Lees meer →</NuxtLink>
       </div>
     </div>
   </section>

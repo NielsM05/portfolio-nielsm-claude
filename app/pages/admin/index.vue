@@ -1,11 +1,15 @@
 <script setup lang="ts">
+interface Collaborator { name: string; linkedinUrl: string }
+
 interface Project {
   id: number
   category: string
   title: string
   description: string
-  link: string
-  linkLabel: string
+  content: string
+  externalLink: string
+  photos: string[]
+  collaborators: Collaborator[]
 }
 
 interface Event {
@@ -17,23 +21,11 @@ interface Event {
   linkedinUrl: string
 }
 
+// Auth
 const isLoggedIn = ref(false)
 const loginPassword = ref('')
 const loginError = ref('')
 const loginLoading = ref(false)
-
-const projects = ref<Project[]>([])
-const events = ref<Event[]>([])
-
-const showProjectForm = ref(false)
-const editingProjectId = ref<number | null>(null)
-const projectForm = ref({ category: '', title: '', description: '', link: '', linkLabel: 'Lees meer →' })
-const projectSaving = ref(false)
-
-const showEventForm = ref(false)
-const editingEventId = ref<number | null>(null)
-const eventForm = ref({ date: '', type: '', title: '', description: '', linkedinUrl: '' })
-const eventSaving = ref(false)
 
 onMounted(async () => {
   try {
@@ -65,6 +57,10 @@ async function logout() {
   loginPassword.value = ''
 }
 
+// Data
+const projects = ref<Project[]>([])
+const events = ref<Event[]>([])
+
 async function loadAll() {
   const [p, e] = await Promise.all([
     $fetch<Project[]>('/api/projects'),
@@ -74,16 +70,34 @@ async function loadAll() {
   events.value = e
 }
 
-// Projects
+// ─── Projects ───────────────────────────────────────────────
+const showProjectForm = ref(false)
+const editingProjectId = ref<number | null>(null)
+const projectSaving = ref(false)
+const photoUploading = ref(false)
+
+function emptyProjectForm(): Omit<Project, 'id'> {
+  return { category: '', title: '', description: '', content: '', externalLink: '', photos: [], collaborators: [] }
+}
+const projectForm = ref(emptyProjectForm())
+
 function startNewProject() {
   editingProjectId.value = null
-  projectForm.value = { category: '', title: '', description: '', link: '', linkLabel: 'Lees meer →' }
+  projectForm.value = emptyProjectForm()
   showProjectForm.value = true
 }
 
 function startEditProject(p: Project) {
   editingProjectId.value = p.id
-  projectForm.value = { category: p.category, title: p.title, description: p.description, link: p.link, linkLabel: p.linkLabel }
+  projectForm.value = {
+    category: p.category,
+    title: p.title,
+    description: p.description,
+    content: p.content ?? '',
+    externalLink: p.externalLink ?? '',
+    photos: [...(p.photos ?? [])],
+    collaborators: (p.collaborators ?? []).map(c => ({ ...c })),
+  }
   showProjectForm.value = true
 }
 
@@ -115,16 +129,56 @@ async function deleteProject(id: number) {
   projects.value = projects.value.filter(p => p.id !== id)
 }
 
-// Events
+// Photos
+async function uploadPhotos(e: Event) {
+  const files = (e.target as HTMLInputElement).files
+  if (!files) return
+  photoUploading.value = true
+  try {
+    for (const file of Array.from(files)) {
+      const form = new FormData()
+      form.append('file', file)
+      const { url } = await $fetch<{ url: string }>('/api/upload', { method: 'POST', body: form })
+      projectForm.value.photos.push(url)
+    }
+  } finally {
+    photoUploading.value = false
+    ;(e.target as HTMLInputElement).value = ''
+  }
+}
+
+function removePhoto(idx: number) {
+  projectForm.value.photos.splice(idx, 1)
+}
+
+// Collaborators
+function addCollaborator() {
+  projectForm.value.collaborators.push({ name: '', linkedinUrl: '' })
+}
+
+function removeCollaborator(idx: number) {
+  projectForm.value.collaborators.splice(idx, 1)
+}
+
+// ─── Events ────────────────────────────────────────────────
+const showEventForm = ref(false)
+const editingEventId = ref<number | null>(null)
+const eventSaving = ref(false)
+
+function emptyEventForm(): Omit<Event, 'id'> {
+  return { date: '', type: '', title: '', description: '', linkedinUrl: '' }
+}
+const eventForm = ref(emptyEventForm())
+
 function startNewEvent() {
   editingEventId.value = null
-  eventForm.value = { date: '', type: '', title: '', description: '', linkedinUrl: '' }
+  eventForm.value = emptyEventForm()
   showEventForm.value = true
 }
 
-function startEditEvent(e: Event) {
-  editingEventId.value = e.id
-  eventForm.value = { date: e.date, type: e.type, title: e.title, description: e.description, linkedinUrl: e.linkedinUrl }
+function startEditEvent(ev: Event) {
+  editingEventId.value = ev.id
+  eventForm.value = { date: ev.date, type: ev.type, title: ev.title, description: ev.description, linkedinUrl: ev.linkedinUrl }
   showEventForm.value = true
 }
 
@@ -183,14 +237,14 @@ async function deleteEvent(id: number) {
     <!-- Admin UI -->
     <div v-else class="admin-inner">
       <header class="admin-header">
-        <div class="admin-header-left">
+        <div>
           <span class="admin-eyebrow">Niels Maes</span>
           <h1 class="admin-title">Admin</h1>
         </div>
         <button class="btn-ghost" @click="logout">Uitloggen</button>
       </header>
 
-      <!-- Projecten -->
+      <!-- ── Projecten ── -->
       <section class="admin-section">
         <div class="section-head">
           <h2 class="section-title">Projecten</h2>
@@ -199,6 +253,7 @@ async function deleteEvent(id: number) {
 
         <div v-if="showProjectForm" class="form-card">
           <h3 class="form-title">{{ editingProjectId !== null ? 'Project bewerken' : 'Nieuw project' }}</h3>
+
           <div class="form-grid">
             <label class="form-label">
               Categorie
@@ -209,18 +264,54 @@ async function deleteEvent(id: number) {
               <input v-model="projectForm.title" type="text" class="field" placeholder="Projecttitel" />
             </label>
             <label class="form-label form-full">
-              Omschrijving
-              <textarea v-model="projectForm.description" class="field field-textarea" placeholder="Beschrijf het project…" />
+              Korte omschrijving <span class="form-hint">(zichtbaar in de lijst)</span>
+              <textarea v-model="projectForm.description" class="field field-textarea" placeholder="Beschrijf het project in één zin…" />
             </label>
-            <label class="form-label">
-              Link
-              <input v-model="projectForm.link" type="text" class="field" placeholder="https://…" />
+            <label class="form-label form-full">
+              Uitgebreide inhoud <span class="form-hint">(zichtbaar op de detailpagina)</span>
+              <textarea v-model="projectForm.content" class="field field-textarea field-textarea-lg" placeholder="Gedetailleerde beschrijving, aanpak, resultaten…" />
             </label>
-            <label class="form-label">
-              Linktekst
-              <input v-model="projectForm.linkLabel" type="text" class="field" placeholder="Lees meer →" />
+            <label class="form-label form-full">
+              Externe link <span class="form-hint">(optioneel — bijv. GitHub)</span>
+              <input v-model="projectForm.externalLink" type="text" class="field" placeholder="https://github.com/…" />
             </label>
           </div>
+
+          <!-- Foto's -->
+          <div class="form-block">
+            <div class="form-block-label">Foto's</div>
+            <div class="photos-grid">
+              <div v-for="(photo, idx) in projectForm.photos" :key="idx" class="photo-thumb">
+                <img :src="photo" alt="Project foto" />
+                <button class="photo-remove" type="button" @click="removePhoto(idx)">×</button>
+              </div>
+              <label class="photo-add" :class="{ loading: photoUploading }">
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  class="photo-input"
+                  :disabled="photoUploading"
+                  @change="uploadPhotos"
+                />
+                <span>{{ photoUploading ? 'Uploaden…' : '+ Foto' }}</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Medewerkers -->
+          <div class="form-block">
+            <div class="form-block-label">Medewerkers</div>
+            <div class="collab-rows">
+              <div v-for="(c, idx) in projectForm.collaborators" :key="idx" class="collab-row">
+                <input v-model="c.name" type="text" class="field" placeholder="Naam" />
+                <input v-model="c.linkedinUrl" type="text" class="field" placeholder="LinkedIn URL" />
+                <button class="btn-icon btn-icon-danger" type="button" @click="removeCollaborator(idx)">×</button>
+              </div>
+              <button class="btn-ghost btn-sm" type="button" @click="addCollaborator">+ Medewerker toevoegen</button>
+            </div>
+          </div>
+
           <div class="form-actions">
             <button class="btn-action" :disabled="projectSaving" @click="saveProject">
               {{ projectSaving ? 'Opslaan…' : 'Opslaan' }}
@@ -237,6 +328,7 @@ async function deleteEvent(id: number) {
               <div class="item-title">{{ p.title }}</div>
             </div>
             <div class="item-actions">
+              <NuxtLink :to="`/projects/${p.id}`" target="_blank" class="btn-icon">Bekijk</NuxtLink>
               <button class="btn-icon" @click="startEditProject(p)">Bewerk</button>
               <button class="btn-icon btn-icon-danger" @click="deleteProject(p.id)">Verwijder</button>
             </div>
@@ -245,7 +337,7 @@ async function deleteEvent(id: number) {
         </div>
       </section>
 
-      <!-- Events -->
+      <!-- ── Events ── -->
       <section class="admin-section">
         <div class="section-head">
           <h2 class="section-title">Events &amp; Blog</h2>
@@ -285,17 +377,17 @@ async function deleteEvent(id: number) {
         </div>
 
         <div class="item-list">
-          <div v-for="e in events" :key="e.id" class="item-row">
+          <div v-for="ev in events" :key="ev.id" class="item-row">
             <div class="item-meta-col">
-              <div class="item-cat">{{ e.type }}</div>
-              <div class="item-date">{{ e.date }}</div>
+              <div class="item-cat">{{ ev.type }}</div>
+              <div class="item-date">{{ ev.date }}</div>
             </div>
             <div class="item-info">
-              <div class="item-title">{{ e.title }}</div>
+              <div class="item-title">{{ ev.title }}</div>
             </div>
             <div class="item-actions">
-              <button class="btn-icon" @click="startEditEvent(e)">Bewerk</button>
-              <button class="btn-icon btn-icon-danger" @click="deleteEvent(e.id)">Verwijder</button>
+              <button class="btn-icon" @click="startEditEvent(ev)">Bewerk</button>
+              <button class="btn-icon btn-icon-danger" @click="deleteEvent(ev.id)">Verwijder</button>
             </div>
           </div>
           <div v-if="!events.length" class="empty-state">Nog geen events.</div>
@@ -354,12 +446,11 @@ async function deleteEvent(id: number) {
   font-family: var(--mono);
   font-size: 0.65rem;
   color: var(--accent);
-  letter-spacing: 0.05em;
 }
 
 /* Admin layout */
 .admin-inner {
-  max-width: 900px;
+  max-width: 960px;
   margin: 0 auto;
   padding: 3rem 2rem 6rem;
 }
@@ -391,9 +482,7 @@ async function deleteEvent(id: number) {
 }
 
 /* Sections */
-.admin-section {
-  margin-bottom: 4rem;
-}
+.admin-section { margin-bottom: 4rem; }
 
 .section-head {
   display: flex;
@@ -410,7 +499,7 @@ async function deleteEvent(id: number) {
   text-transform: uppercase;
 }
 
-/* Form */
+/* Form card */
 .form-card {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -433,9 +522,7 @@ async function deleteEvent(id: number) {
   margin-bottom: 1.5rem;
 }
 
-.form-full {
-  grid-column: 1 / -1;
-}
+.form-full { grid-column: 1 / -1; }
 
 .form-label {
   display: flex;
@@ -448,10 +535,35 @@ async function deleteEvent(id: number) {
   text-transform: uppercase;
 }
 
+.form-hint {
+  font-size: 0.55rem;
+  color: var(--text);
+  letter-spacing: 0.05em;
+  text-transform: none;
+  font-family: var(--body);
+  opacity: 0.6;
+}
+
+.form-block {
+  margin-bottom: 1.5rem;
+}
+
+.form-block-label {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  color: var(--text);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+}
+
 .form-actions {
   display: flex;
   gap: 0.75rem;
   align-items: center;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  margin-top: 1.5rem;
 }
 
 /* Fields */
@@ -467,13 +579,91 @@ async function deleteEvent(id: number) {
   width: 100%;
 }
 
-.field:focus {
-  border-color: var(--accent);
-}
+.field:focus { border-color: var(--accent); }
 
 .field-textarea {
   resize: vertical;
-  min-height: 100px;
+  min-height: 80px;
+}
+
+.field-textarea-lg {
+  min-height: 140px;
+}
+
+/* Photos */
+.photos-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.photo-thumb {
+  position: relative;
+  width: 110px;
+  height: 80px;
+  overflow: hidden;
+  background: var(--bg);
+  border: 1px solid var(--border);
+}
+
+.photo-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.photo-remove {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 20px;
+  height: 20px;
+  background: var(--accent);
+  color: var(--white);
+  border: none;
+  cursor: pointer;
+  font-size: 0.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.photo-add {
+  width: 110px;
+  height: 80px;
+  border: 1px dashed var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  color: var(--text);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.photo-add:hover { border-color: var(--accent); color: var(--accent); }
+.photo-add.loading { opacity: 0.5; pointer-events: none; }
+
+.photo-input {
+  display: none;
+}
+
+/* Collaborators */
+.collab-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.collab-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 0.5rem;
+  align-items: center;
 }
 
 /* Item list */
@@ -492,9 +682,7 @@ async function deleteEvent(id: number) {
   border-bottom: 1px solid var(--border);
 }
 
-.item-row:first-child {
-  border-top: 1px solid var(--border);
-}
+.item-row:first-child { border-top: 1px solid var(--border); }
 
 .item-num {
   font-family: var(--mono);
@@ -563,10 +751,7 @@ async function deleteEvent(id: number) {
   color: var(--accent);
 }
 
-.btn-action:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
+.btn-action:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .btn-ghost {
   font-family: var(--mono);
@@ -579,12 +764,13 @@ async function deleteEvent(id: number) {
   border: 1px solid var(--border);
   cursor: pointer;
   transition: all 0.2s;
+  text-decoration: none;
+  display: inline-block;
 }
 
-.btn-ghost:hover {
-  border-color: var(--white);
-  color: var(--white);
-}
+.btn-ghost:hover { border-color: var(--white); color: var(--white); }
+
+.btn-sm { padding: 0.5rem 1rem; }
 
 .btn-icon {
   font-family: var(--mono);
@@ -598,15 +784,10 @@ async function deleteEvent(id: number) {
   cursor: pointer;
   transition: all 0.2s;
   white-space: nowrap;
+  text-decoration: none;
+  display: inline-block;
 }
 
-.btn-icon:hover {
-  border-color: var(--white);
-  color: var(--white);
-}
-
-.btn-icon-danger:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-}
+.btn-icon:hover { border-color: var(--white); color: var(--white); }
+.btn-icon-danger:hover { border-color: var(--accent); color: var(--accent); }
 </style>
