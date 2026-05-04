@@ -2,10 +2,10 @@
 const { t } = useLocale()
 
 const certifications = [
-  { name: 'CompTIA Security+', year: '2023' },
-  { name: 'CEH — Ethical Hacker', year: '2024' },
-  { name: 'OSCP (In progress)', year: '2025' },
-  { name: 'ISO 27001 Awareness', year: '2023' },
+  { name: 'SEC0 - TryHackMe', year: '2026' },
+  { name: 'SEC1 - TryHackMe', year: '2026' },
+  { name: 'Cybersecurity Bachelor (in progress) - Howest', year: '2023-2026' },
+
 ]
 </script>
 

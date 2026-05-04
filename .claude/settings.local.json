@@ -16,7 +16,14 @@
       "Bash(curl -s http://localhost:3000/api/projects/1)",
       "Bash(curl -s -X POST http://localhost:3000/api/auth -H 'Content-Type: application/json' -d '{\"password\":\"Kaasje123!\"}' -c /tmp/admin_cookie.txt)",
       "Bash(curl -s -X POST http://localhost:3000/api/upload -b /tmp/admin_cookie.txt -F 'file=@/tmp/test.png;type=image/png')",
-      "Bash(curl -s http://localhost:3000/projects/1)"
+      "Bash(curl -s http://localhost:3000/projects/1)",
+      "Bash(git -C /Users/niels/Development/WebProjecten/portfolio-nielsm-claude status)",
+      "Bash(git -C /Users/niels/Development/WebProjecten/portfolio-nielsm-claude log --oneline -3)",
+      "Bash(git -C /Users/niels/Development/WebProjecten/portfolio-nielsm-claude add app/composables/useLocale.ts app/components/AboutSection.vue app/components/AppFooter.vue app/components/AppNav.vue app/components/ContactSection.vue app/components/EventsSection.vue app/components/HeroSection.vue app/components/SkillsSection.vue app/pages/index.vue 'app/pages/projects/[id].vue')",
+      "Bash(git -C /Users/niels/Development/WebProjecten/portfolio-nielsm-claude commit -m ' *)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000)",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\('OK -', len\\(d\\), 'projects, fields:', list\\(d[0].keys\\(\\)\\)[:6]\\)\")",
+      "Bash(git -C /Users/niels/Development/WebProjecten/portfolio-nielsm-claude add server/data/projects.json server/api/projects/index.post.ts server/api/events/index.post.ts app/components/ProjectsSection.vue app/components/EventsSection.vue 'app/pages/projects/[id].vue' app/pages/admin/index.vue)"
     ]
   }
 }

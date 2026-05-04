@@ -1,24 +1,5 @@
 [
   {
-    "id": 1,
-    "category_en": "Website",
-    "category_nl": "Website",
-    "title_en": "Stellarnode Homepage",
-    "title_nl": "Stellarnode Homepage",
-    "description_en": "",
-    "description_nl": "De homepagina gemaakt van Stellarnode.be",
-    "content_en": "",
-    "content_nl": "Voor Stellarnode VOF, een bedrijf gespecialiseerd in website hosting en softwareontwikkeling, ontwikkelde ik de volledige homepage als freelance opdracht. De frontend werd gebouwd in Vue.js, met een Laravel backend voor de serverkant. Het project omvatte het vertalen van een professioneel design naar een performante, gebruiksvriendelijke webpagina die de diensten en identiteit van het bedrijf sterk naar voren brengt.",
-    "externalLink": "https://github.com/StellarNode-BE/stellarnodefrontend",
-    "photos": [],
-    "collaborators": [
-      {
-        "name": "Milan Beernaert",
-        "linkedinUrl": "https://www.linkedin.com/in/milan-beernaert-273620279/"
-      }
-    ]
-  },
-  {
     "id": 2,
     "category_en": "Security",
     "category_nl": "",

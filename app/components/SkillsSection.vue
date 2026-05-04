@@ -15,9 +15,9 @@ const skillGroups = [
     key: 1,
     skills: [
       { name: 'Incident Response', level: '///', highlight: true },
-      { name: 'SIEM / Logging', level: '//', highlight: true },
-      { name: 'Threat Modelling', level: '///', highlight: true },
-      { name: 'Forensics', level: '//', highlight: false },
+      { name: 'Threat Modelling', level: '//', highlight: true },
+      { name: 'Forensics', level: '///', highlight: true },
+      { name: 'SIEM / Logging', level: '//', highlight: false },
     ],
   },
   {
