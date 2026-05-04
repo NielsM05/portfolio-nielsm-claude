@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  nuxt-app:
+    build: .
+    container_name: nuxt_preview
+    networks:
+      - scoobydoo
+    restart: unless-stopped
+
+networks:
+  scoobydoo:
+    external: true
