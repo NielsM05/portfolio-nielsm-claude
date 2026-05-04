@@ -8,6 +8,7 @@ interface Event {
   linkedinUrl: string
 }
 
+const { t } = useLocale()
 const { data: events } = await useFetch<Event[]>('/api/events')
 </script>
 
@@ -16,11 +17,11 @@ const { data: events } = await useFetch<Event[]>('/api/events')
     <div class="events-inner">
       <div class="events-top reveal">
         <div>
-          <div class="events-eyebrow">Blog &amp; Events</div>
-          <h2 class="events-title">Wat ik<br><em>deel</em></h2>
+          <div class="events-eyebrow">{{ t.events.eyebrow }}</div>
+          <h2 class="events-title">{{ t.events.title }}<br><em>{{ t.events.titleEm }}</em></h2>
         </div>
         <p class="events-sub">
-          Spreekbeurten, workshops en inzichten — ook te volgen via
+          {{ t.events.sub }}
           <a href="https://linkedin.com" target="_blank" rel="noopener" class="li-link">LinkedIn</a>.
         </p>
       </div>
@@ -40,7 +41,7 @@ const { data: events } = await useFetch<Event[]>('/api/events')
             <p class="event-desc">{{ event.description }}</p>
           </div>
           <a :href="event.linkedinUrl" target="_blank" rel="noopener" class="event-link">
-            Bekijk op LinkedIn →
+            {{ t.events.linkedin }}
           </a>
         </article>
       </div>

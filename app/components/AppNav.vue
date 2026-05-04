@@ -1,4 +1,6 @@
 <script setup lang="ts">
+const { t, locale, toggle } = useLocale()
+
 const isDark = ref(false)
 
 onMounted(() => {
@@ -12,12 +14,17 @@ onMounted(() => {
   <nav :class="{ dark: isDark }">
     <div class="nav-mark">NIELS MAES <em>//</em> SEC</div>
     <ul class="nav-menu">
-      <li><a href="/#about">Over</a></li>
-      <li><a href="/#projects">Projecten</a></li>
-      <li><a href="/#skills">Skills</a></li>
-      <li><a href="/#events">Events</a></li>
-      <li><a href="/#contact">Contact</a></li>
+      <li><a href="/#about">{{ t.nav.about }}</a></li>
+      <li><a href="/#projects">{{ t.nav.projects }}</a></li>
+      <li><a href="/#skills">{{ t.nav.skills }}</a></li>
+      <li><a href="/#events">{{ t.nav.events }}</a></li>
+      <li><a href="/#contact">{{ t.nav.contact }}</a></li>
     </ul>
+    <button class="lang-toggle" @click="toggle">
+      <span :class="{ active: locale === 'en' }">EN</span>
+      <span class="sep">/</span>
+      <span :class="{ active: locale === 'nl' }">NL</span>
+    </button>
   </nav>
 </template>
 
@@ -68,5 +75,32 @@ nav.dark {
 
 .nav-menu a:hover {
   color: var(--white);
+}
+
+.lang-toggle {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text);
+  cursor: pointer;
+  padding: 0.35rem 0.7rem;
+  display: flex;
+  gap: 0.3rem;
+  align-items: center;
+  transition: border-color 0.2s;
+}
+
+.lang-toggle:hover {
+  border-color: var(--text);
+}
+
+.lang-toggle .sep {
+  opacity: 0.3;
+}
+
+.lang-toggle span.active {
+  color: var(--accent);
 }
 </style>

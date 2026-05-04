@@ -1,7 +1,9 @@
 <script setup lang="ts">
+const { t } = useLocale()
+
 const skillGroups = [
   {
-    title: 'Offensief',
+    key: 0,
     skills: [
       { name: 'Penetration Testing', level: '///', highlight: true },
       { name: 'Web App Hacking', level: '///', highlight: true },
@@ -10,7 +12,7 @@ const skillGroups = [
     ],
   },
   {
-    title: 'Defensief',
+    key: 1,
     skills: [
       { name: 'Incident Response', level: '///', highlight: true },
       { name: 'SIEM / Logging', level: '//', highlight: true },
@@ -19,7 +21,7 @@ const skillGroups = [
     ],
   },
   {
-    title: 'Tools',
+    key: 2,
     skills: [
       { name: 'Burp Suite', level: '///', highlight: true },
       { name: 'Metasploit', level: '//', highlight: true },
@@ -28,7 +30,7 @@ const skillGroups = [
     ],
   },
   {
-    title: 'Code',
+    key: 3,
     skills: [
       { name: 'Python', level: '///', highlight: true },
       { name: 'Bash', level: '///', highlight: true },
@@ -44,16 +46,16 @@ const skillGroups = [
     <div class="skills-inner">
       <div class="skills-top reveal">
         <h2>Skills &<br><em>Expertise</em></h2>
-        <p>Een combinatie van offensieve en defensieve technieken — opgebouwd door jarenlange praktijkervaring en continue bijscholing.</p>
+        <p>{{ t.skills.sub }}</p>
       </div>
 
       <div class="skills-grid reveal">
         <div
           v-for="group in skillGroups"
-          :key="group.title"
+          :key="group.key"
           class="skill-block"
         >
-          <div class="skill-block-title">{{ group.title }}</div>
+          <div class="skill-block-title">{{ t.skills.groups[group.key] }}</div>
           <div
             v-for="skill in group.skills"
             :key="skill.name"

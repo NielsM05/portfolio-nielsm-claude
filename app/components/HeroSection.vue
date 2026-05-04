@@ -1,3 +1,7 @@
+<script setup lang="ts">
+const { t } = useLocale()
+</script>
+
 <template>
   <section id="hero">
     <div class="grid-bg" />
@@ -8,22 +12,19 @@
       <span>Scroll</span>
     </div>
 
-    <div class="hero-eyebrow">Cybersecurity Specialist — Beschikbaar voor werk</div>
+    <div class="hero-eyebrow">{{ t.hero.eyebrow }}</div>
 
     <h1 class="cinematic">
-      IK HOUD<br>
-      <span class="italic">AANVALLERS</span><br>
-      BUITEN.
+      {{ t.hero.line1 }}<br>
+      <span class="italic">{{ t.hero.line2 }}</span><br>
+      {{ t.hero.line3 }}
     </h1>
 
     <div class="hero-bottom">
-      <p class="hero-sub">
-        Penetration tester, security architect en ethisch hacker.
-        Ik vind de zwakheden voordat de aanvallers dat doen.
-      </p>
+      <p class="hero-sub">{{ t.hero.sub }}</p>
       <div class="hero-actions">
-        <a href="#projects" class="btn btn-red">Mijn werk</a>
-        <a href="#contact" class="btn btn-outline">Neem contact op</a>
+        <a href="#projects" class="btn btn-red">{{ t.hero.btn1 }}</a>
+        <a href="#contact" class="btn btn-outline">{{ t.hero.btn2 }}</a>
       </div>
     </div>
   </section>

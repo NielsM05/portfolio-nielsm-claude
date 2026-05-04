@@ -1,61 +1,53 @@
 <script setup lang="ts">
-const form = reactive({
-  name: '',
-  email: '',
-  message: '',
-})
+const { t } = useLocale()
+
+const form = reactive({ name: '', email: '', message: '' })
 
 function handleSubmit() {
-  // Form submission logic here
   console.log('Form submitted:', form)
 }
 </script>
 
 <template>
   <section id="contact">
-    <div class="contact-big reveal">
-      Klaar om<br>samen te <em>werken?</em>
-    </div>
+    <div class="contact-big reveal" v-html="t.contact.big" />
 
     <div class="contact-split">
       <div class="contact-info reveal">
-        <p>
-          Of je nu een pentest nodig hebt, advies zoekt over je security-architectuur,
-          of gewoon een vraag hebt — ik reageer binnen 24 uur.
-        </p>
-        <p>Gebaseerd in Brugge, beschikbaar remote en on-site.</p>
+        <p>{{ t.contact.p1 }}</p>
+        <p>{{ t.contact.p2 }}</p>
         <a href="mailto:niels@nielsm.dev" class="contact-mail">niels@nielsm.dev</a>
       </div>
 
       <div class="reveal">
         <form @submit.prevent="handleSubmit">
           <div class="form-row">
-            <label for="contact-name">Naam</label>
+            <label for="contact-name">{{ t.contact.labelName }}</label>
             <input
               id="contact-name"
               v-model="form.name"
               type="text"
-              placeholder="Jouw naam"
+              :placeholder="t.contact.placeholderName"
             />
           </div>
           <div class="form-row">
-            <label for="contact-email">Email</label>
+            <label for="contact-email">{{ t.contact.labelEmail }}</label>
             <input
               id="contact-email"
               v-model="form.email"
               type="email"
-              placeholder="jouw@email.com"
+              placeholder="email@example.com"
             />
           </div>
           <div class="form-row">
-            <label for="contact-message">Bericht</label>
+            <label for="contact-message">{{ t.contact.labelMessage }}</label>
             <textarea
               id="contact-message"
               v-model="form.message"
-              placeholder="Vertel me hoe ik kan helpen..."
+              :placeholder="t.contact.placeholderMessage"
             />
           </div>
-          <button type="submit" class="form-btn">Verstuur bericht →</button>
+          <button type="submit" class="form-btn">{{ t.contact.submit }}</button>
         </form>
       </div>
     </div>
@@ -78,7 +70,7 @@ function handleSubmit() {
   margin-bottom: 4rem;
 }
 
-.contact-big em {
+.contact-big :deep(em) {
   color: var(--accent);
   font-style: italic;
 }

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+const { t } = useLocale()
 useReveal()
 </script>
 
@@ -6,15 +7,15 @@ useReveal()
   <div>
     <AppNav />
     <HeroSection />
-    <ChapterDivider num="01" title="Identificatie" />
+    <ChapterDivider num="01" :title="t.chapters[0]" />
     <AboutSection />
-    <ChapterDivider num="02" title="Bewijs van werk" />
+    <ChapterDivider num="02" :title="t.chapters[1]" />
     <ProjectsSection />
-    <ChapterDivider num="03" title="Capaciteiten" />
+    <ChapterDivider num="03" :title="t.chapters[2]" />
     <SkillsSection />
-    <ChapterDivider num="04" title="Activiteit" />
+    <ChapterDivider num="04" :title="t.chapters[3]" />
     <EventsSection />
-    <ChapterDivider num="05" title="Verbinding" />
+    <ChapterDivider num="05" :title="t.chapters[4]" />
     <ContactSection />
     <AppFooter />
   </div>

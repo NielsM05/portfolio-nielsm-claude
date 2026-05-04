@@ -13,6 +13,7 @@ interface Project {
 }
 
 const route = useRoute()
+const { t } = useLocale()
 const { data: project, error } = await useFetch<Project>(`/api/projects/${route.params.id}`)
 
 if (error.value) {
@@ -25,7 +26,7 @@ if (error.value) {
     <AppNav />
 
     <main class="detail-main">
-      <NuxtLink to="/#projects" class="back-link">← Terug naar portfolio</NuxtLink>
+      <NuxtLink to="/#projects" class="back-link">{{ t.project.back }}</NuxtLink>
 
       <header class="detail-header">
         <div class="detail-eyebrow">{{ project!.category }}</div>
@@ -33,9 +34,8 @@ if (error.value) {
         <p class="detail-lead">{{ project!.description }}</p>
       </header>
 
-      <!-- Collaborators -->
       <section v-if="project!.collaborators?.length" class="detail-section">
-        <h2 class="detail-section-label">Medewerkers</h2>
+        <h2 class="detail-section-label">{{ t.project.collaborators }}</h2>
         <div class="collab-list">
           <a
             v-for="(c, i) in project!.collaborators"
@@ -51,9 +51,8 @@ if (error.value) {
         </div>
       </section>
 
-      <!-- Photos -->
       <section v-if="project!.photos?.length" class="detail-section">
-        <h2 class="detail-section-label">Foto's</h2>
+        <h2 class="detail-section-label">{{ t.project.photos }}</h2>
         <div class="photos-grid">
           <a
             v-for="(photo, i) in project!.photos"
@@ -63,21 +62,19 @@ if (error.value) {
             rel="noopener"
             class="photo-link"
           >
-            <img :src="photo" :alt="`${project!.title} foto ${i + 1}`" class="photo-img" />
+            <img :src="photo" :alt="`${project!.title} ${t.project.photos} ${i + 1}`" class="photo-img" />
           </a>
         </div>
       </section>
 
-      <!-- Extended content -->
       <section v-if="project!.content" class="detail-section">
-        <h2 class="detail-section-label">Details</h2>
+        <h2 class="detail-section-label">{{ t.project.details }}</h2>
         <div class="detail-content">{{ project!.content }}</div>
       </section>
 
-      <!-- External link -->
       <div v-if="project!.externalLink" class="detail-cta">
         <a :href="project!.externalLink" target="_blank" rel="noopener" class="btn btn-red">
-          Bekijk project →
+          {{ t.project.viewProject }}
         </a>
       </div>
     </main>
@@ -144,7 +141,6 @@ if (error.value) {
   max-width: 680px;
 }
 
-/* Sections */
 .detail-section {
   margin-bottom: 3.5rem;
 }
@@ -158,7 +154,6 @@ if (error.value) {
   margin-bottom: 1.5rem;
 }
 
-/* Collaborators */
 .collab-list {
   display: flex;
   flex-wrap: wrap;
@@ -192,7 +187,6 @@ if (error.value) {
   text-transform: uppercase;
 }
 
-/* Photos */
 .photos-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -217,7 +211,6 @@ if (error.value) {
   transform: scale(1.04);
 }
 
-/* Content */
 .detail-content {
   font-size: 0.9rem;
   line-height: 1.9;
@@ -225,7 +218,6 @@ if (error.value) {
   max-width: 680px;
 }
 
-/* CTA */
 .detail-cta {
   margin-top: 3rem;
   padding-top: 3rem;

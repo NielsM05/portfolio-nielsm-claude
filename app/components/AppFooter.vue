@@ -1,7 +1,13 @@
+<script setup lang="ts">
+const { t } = useLocale()
+const year = new Date().getFullYear()
+const location = computed(() => t.value.footer.location.replace('{{ year }}', String(year)))
+</script>
+
 <template>
   <footer>
     <span>NIELS MAES — CYBERSECURITY SPECIALIST</span>
-    <span>© {{ new Date().getFullYear() }} — BRUGGE, BELGIË</span>
+    <span>{{ location }}</span>
   </footer>
 </template>
 

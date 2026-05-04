@@ -1,4 +1,6 @@
 <script setup lang="ts">
+const { t } = useLocale()
+
 const certifications = [
   { name: 'CompTIA Security+', year: '2023' },
   { name: 'CEH — Ethical Hacker', year: '2024' },
@@ -9,22 +11,12 @@ const certifications = [
 
 <template>
   <section id="about">
-    <p class="about-hero-text reveal">
-      Ik ben <em>Niels Maes</em> — een cybersecurity specialist die gelooft
-      dat de beste verdediging begint met denken als een aanvaller.
-    </p>
+    <p class="about-hero-text reveal" v-html="t.about.intro" />
 
     <div class="about-cols reveal">
       <div>
-        <p>
-          Met jaren ervaring in zowel offensieve als defensieve security help ik bedrijven,
-          overheden en individuen hun digitale omgeving aantoonbaar veiliger te maken.
-          Geen generieke adviezen — concrete bevindingen, duidelijke rapportages en haalbare oplossingen.
-        </p>
-        <p>
-          Mijn specialiteit ligt in webapplicaties, netwerksecurity en social engineering assessments.
-          Ik denk als een aanvaller, maar werk als een trusted advisor.
-        </p>
+        <p>{{ t.about.p1 }}</p>
+        <p>{{ t.about.p2 }}</p>
       </div>
 
       <div>
@@ -60,7 +52,7 @@ const certifications = [
   margin-bottom: 4rem;
 }
 
-.about-hero-text em {
+.about-hero-text :deep(em) {
   color: var(--accent);
   font-style: italic;
 }
