@@ -12,7 +12,9 @@ useReveal()
     <ProjectsSection />
     <ChapterDivider num="03" title="Capaciteiten" />
     <SkillsSection />
-    <ChapterDivider num="04" title="Verbinding" />
+    <ChapterDivider num="04" title="Activiteit" />
+    <EventsSection />
+    <ChapterDivider num="05" title="Verbinding" />
     <ContactSection />
     <AppFooter />
   </div>
