@@ -1,30 +1,39 @@
 <script setup lang="ts">
 const { t, locale, toggle } = useLocale()
-
 const isDark = ref(false)
+const isMenuOpen = ref(false)
 
 onMounted(() => {
   const onScroll = () => { isDark.value = window.scrollY > 60 }
   window.addEventListener('scroll', onScroll, { passive: true })
   onUnmounted(() => window.removeEventListener('scroll', onScroll))
 })
+
+function closeMenu() { isMenuOpen.value = false }
 </script>
 
 <template>
   <nav :class="{ dark: isDark }">
     <div class="nav-mark">NIELS MAES <em>//</em> SEC</div>
-    <ul class="nav-menu">
-      <li><a href="/#about">{{ t.nav.about }}</a></li>
-      <li><a href="/#projects">{{ t.nav.projects }}</a></li>
-      <li><a href="/#skills">{{ t.nav.skills }}</a></li>
-      <li><a href="/#events">{{ t.nav.events }}</a></li>
-      <li><a href="/#contact">{{ t.nav.contact }}</a></li>
+
+    <ul class="nav-menu" :class="{ open: isMenuOpen }">
+      <li><a href="/#about" @click="closeMenu">{{ t.nav.about }}</a></li>
+      <li><a href="/#projects" @click="closeMenu">{{ t.nav.projects }}</a></li>
+      <li><a href="/#skills" @click="closeMenu">{{ t.nav.skills }}</a></li>
+      <li><a href="/#events" @click="closeMenu">{{ t.nav.events }}</a></li>
+      <li><a href="/#contact" @click="closeMenu">{{ t.nav.contact }}</a></li>
     </ul>
-    <button class="lang-toggle" @click="toggle">
-      <span :class="{ active: locale === 'en' }">EN</span>
-      <span class="sep">/</span>
-      <span :class="{ active: locale === 'nl' }">NL</span>
-    </button>
+
+    <div class="nav-right">
+      <button class="lang-toggle" @click="toggle">
+        <span :class="{ active: locale === 'en' }">EN</span>
+        <span class="sep">/</span>
+        <span :class="{ active: locale === 'nl' }">NL</span>
+      </button>
+      <button class="hamburger" :class="{ open: isMenuOpen }" aria-label="Menu" @click="isMenuOpen = !isMenuOpen">
+        <span /><span /><span />
+      </button>
+    </div>
   </nav>
 </template>
 
@@ -50,12 +59,11 @@ nav.dark {
   font-size: 0.7rem;
   color: var(--white);
   letter-spacing: 0.1em;
+  position: relative;
+  z-index: 101;
 }
 
-.nav-mark em {
-  color: var(--accent);
-  font-style: normal;
-}
+.nav-mark em { color: var(--accent); font-style: normal; }
 
 .nav-menu {
   display: flex;
@@ -73,8 +81,14 @@ nav.dark {
   transition: color 0.2s;
 }
 
-.nav-menu a:hover {
-  color: var(--white);
+.nav-menu a:hover { color: var(--white); }
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  position: relative;
+  z-index: 101;
 }
 
 .lang-toggle {
@@ -92,15 +106,56 @@ nav.dark {
   transition: border-color 0.2s;
 }
 
-.lang-toggle:hover {
-  border-color: var(--text);
+.lang-toggle:hover { border-color: var(--text); }
+.lang-toggle .sep { opacity: 0.3; }
+.lang-toggle span.active { color: var(--accent); }
+
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
 }
 
-.lang-toggle .sep {
-  opacity: 0.3;
+.hamburger span {
+  display: block;
+  width: 22px;
+  height: 1px;
+  background: var(--white);
+  transition: transform 0.3s, opacity 0.3s;
 }
 
-.lang-toggle span.active {
-  color: var(--accent);
+.hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(4px, 4px); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(4px, -4px); }
+
+@media (max-width: 768px) {
+  nav { padding: 1.5rem; }
+
+  .hamburger { display: flex; }
+
+  .nav-menu {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2.5rem;
+    z-index: 100;
+    transform: translateX(100%);
+    transition: transform 0.35s ease;
+  }
+
+  .nav-menu.open { transform: translateX(0); }
+
+  .nav-menu a {
+    font-size: 1.1rem;
+    letter-spacing: 0.15em;
+    color: var(--white);
+  }
 }
 </style>

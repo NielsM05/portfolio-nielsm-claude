@@ -55,19 +55,10 @@ const display = computed(() => (events.value ?? []).map(e => ({
 </template>
 
 <style scoped>
-#events {
-  padding: 8rem 4rem;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
+#events { padding: 8rem 4rem; max-width: 1200px; margin: 0 auto; }
 .events-inner { display: flex; flex-direction: column; gap: 5rem; }
 
-.events-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-}
+.events-top { display: flex; justify-content: space-between; align-items: flex-end; }
 
 .events-eyebrow {
   font-family: var(--mono);
@@ -78,40 +69,21 @@ const display = computed(() => (events.value ?? []).map(e => ({
   margin-bottom: 1rem;
 }
 
-.events-title {
-  font-family: var(--display);
-  font-size: clamp(3rem, 6vw, 5rem);
-  color: var(--white);
-  font-weight: 900;
-  line-height: 0.9;
-}
-
+.events-title { font-family: var(--display); font-size: clamp(2.5rem, 6vw, 5rem); color: var(--white); font-weight: 900; line-height: 0.9; }
 .events-title em { font-style: italic; color: var(--accent); }
 
-.events-sub {
-  max-width: 300px;
-  font-size: 0.85rem;
-  line-height: 1.7;
-  text-align: right;
-}
+.events-sub { max-width: 300px; font-size: 0.85rem; line-height: 1.7; text-align: right; }
 
-.li-link {
-  color: var(--white);
-  text-decoration: none;
-  border-bottom: 1px solid var(--accent);
-  padding-bottom: 0.1rem;
-  transition: color 0.2s;
-}
-
+.li-link { color: var(--white); text-decoration: none; border-bottom: 1px solid var(--accent); padding-bottom: 0.1rem; transition: color 0.2s; }
 .li-link:hover { color: var(--accent); }
 
 .events-list { display: flex; flex-direction: column; gap: 1px; }
 
 .event-card {
   display: grid;
-  grid-template-columns: 220px 1fr auto;
+  grid-template-columns: 200px 1fr auto;
   align-items: center;
-  gap: 3rem;
+  gap: 2rem;
   padding: 2.5rem 0;
   border-bottom: 1px solid var(--border);
   transition: border-color 0.3s;
@@ -121,39 +93,27 @@ const display = computed(() => (events.value ?? []).map(e => ({
 .event-card:hover { border-color: var(--accent); }
 
 .event-meta { display: flex; flex-direction: column; gap: 0.5rem; }
-
-.event-type {
-  font-family: var(--mono);
-  font-size: 0.6rem;
-  color: var(--accent);
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-}
-
+.event-type { font-family: var(--mono); font-size: 0.6rem; color: var(--accent); letter-spacing: 0.2em; text-transform: uppercase; }
 .event-date { font-family: var(--mono); font-size: 0.65rem; color: var(--text); }
 
-.event-title {
-  font-family: var(--display);
-  font-size: 1.25rem;
-  color: var(--white);
-  font-weight: 700;
-  margin-bottom: 0.5rem;
-  line-height: 1.3;
-}
+.event-title { font-family: var(--display); font-size: 1.25rem; color: var(--white); font-weight: 700; margin-bottom: 0.5rem; line-height: 1.3; }
+.event-desc { font-size: 0.85rem; line-height: 1.7; }
 
-.event-desc { font-size: 0.85rem; line-height: 1.7; max-width: 580px; }
-
-.event-link {
-  font-family: var(--mono);
-  font-size: 0.6rem;
-  color: var(--text);
-  text-decoration: none;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  white-space: nowrap;
-  transition: color 0.2s;
-  flex-shrink: 0;
-}
-
+.event-link { font-family: var(--mono); font-size: 0.6rem; color: var(--text); text-decoration: none; letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap; transition: color 0.2s; flex-shrink: 0; }
 .event-link:hover { color: var(--accent); }
+
+@media (max-width: 768px) {
+  #events { padding: 4rem 1.5rem; }
+  .events-inner { gap: 3rem; }
+  .events-top { flex-direction: column; align-items: flex-start; gap: 1.5rem; }
+  .events-sub { text-align: left; max-width: 100%; }
+
+  .event-card {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+    padding: 1.5rem 0;
+  }
+
+  .event-link { margin-top: 0.25rem; }
+}
 </style>

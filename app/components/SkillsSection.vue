@@ -50,17 +50,9 @@ const skillGroups = [
       </div>
 
       <div class="skills-grid reveal">
-        <div
-          v-for="group in skillGroups"
-          :key="group.key"
-          class="skill-block"
-        >
+        <div v-for="group in skillGroups" :key="group.key" class="skill-block">
           <div class="skill-block-title">{{ t.skills.groups[group.key] }}</div>
-          <div
-            v-for="skill in group.skills"
-            :key="skill.name"
-            class="s-item"
-          >
+          <div v-for="skill in group.skills" :key="skill.name" class="s-item">
             <span>{{ skill.name }}</span>
             <span class="s-lvl" :class="{ hi: skill.highlight }">{{ skill.level }}</span>
           </div>
@@ -77,10 +69,7 @@ const skillGroups = [
   border-top: 1px solid var(--border);
 }
 
-.skills-inner {
-  max-width: 1200px;
-  margin: 0 auto;
-}
+.skills-inner { max-width: 1200px; margin: 0 auto; }
 
 .skills-top {
   display: flex;
@@ -91,18 +80,13 @@ const skillGroups = [
 
 .skills-top h2 {
   font-family: var(--display);
-  font-size: clamp(3rem, 6vw, 5rem);
+  font-size: clamp(2.5rem, 6vw, 5rem);
   color: var(--white);
   font-weight: 900;
   font-style: italic;
 }
 
-.skills-top p {
-  max-width: 300px;
-  font-size: 0.85rem;
-  line-height: 1.7;
-  text-align: right;
-}
+.skills-top p { max-width: 300px; font-size: 0.85rem; line-height: 1.7; text-align: right; }
 
 .skills-grid {
   display: grid;
@@ -111,10 +95,7 @@ const skillGroups = [
   background: var(--border);
 }
 
-.skill-block {
-  background: var(--surface);
-  padding: 2rem 1.5rem;
-}
+.skill-block { background: var(--surface); padding: 2rem 1.5rem; }
 
 .skill-block-title {
   font-family: var(--mono);
@@ -135,21 +116,20 @@ const skillGroups = [
   align-items: center;
 }
 
-.s-item:last-child {
-  border-bottom: none;
+.s-item:last-child { border-bottom: none; }
+.s-item:hover { color: var(--white); }
+
+.s-lvl { font-family: var(--mono); font-size: 0.6rem; color: var(--border); }
+.s-lvl.hi { color: var(--accent); }
+
+@media (max-width: 768px) {
+  #skills { padding: 4rem 1.5rem; }
+  .skills-top { flex-direction: column; align-items: flex-start; gap: 1.5rem; margin-bottom: 2.5rem; }
+  .skills-top p { text-align: left; max-width: 100%; }
+  .skills-grid { grid-template-columns: 1fr 1fr; }
 }
 
-.s-item:hover {
-  color: var(--white);
-}
-
-.s-lvl {
-  font-family: var(--mono);
-  font-size: 0.6rem;
-  color: var(--border);
-}
-
-.s-lvl.hi {
-  color: var(--accent);
+@media (max-width: 480px) {
+  .skills-grid { grid-template-columns: 1fr; }
 }
 </style>

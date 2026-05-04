@@ -81,11 +81,12 @@ const { t } = useLocale()
   width: 40px;
   height: 1px;
   background: var(--accent);
+  flex-shrink: 0;
 }
 
 h1.cinematic {
   font-family: var(--display);
-  font-size: clamp(4rem, 11vw, 13rem);
+  font-size: clamp(3.5rem, 11vw, 13rem);
   font-weight: 900;
   color: var(--white);
   line-height: 0.85;
@@ -95,10 +96,7 @@ h1.cinematic {
   animation: up 0.9s 0.5s forwards;
 }
 
-h1.cinematic .italic {
-  font-style: italic;
-  color: var(--accent);
-}
+h1.cinematic .italic { font-style: italic; color: var(--accent); }
 
 .hero-bottom {
   display: flex;
@@ -149,5 +147,23 @@ h1.cinematic .italic {
   height: 80px;
   background: linear-gradient(to bottom, var(--accent), transparent);
   animation: grow 2s ease-in-out infinite;
+}
+
+@media (max-width: 768px) {
+  #hero { padding: 0 1.5rem 3rem; }
+  .scroll-cue { display: none; }
+
+  .hero-bottom {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+    margin-top: 2rem;
+  }
+
+  .hero-sub { max-width: 100%; font-size: 0.85rem; }
+
+  .hero-actions { flex-wrap: wrap; }
+
+  .hero-eyebrow { font-size: 0.55rem; }
 }
 </style>

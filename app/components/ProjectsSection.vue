@@ -57,7 +57,6 @@ const display = computed(() => (projects.value ?? []).map(p => ({
 }
 
 .proj-editorial:hover { border-color: var(--accent); }
-
 .proj-editorial.reverse { direction: rtl; }
 .proj-editorial.reverse > * { direction: ltr; }
 
@@ -87,10 +86,7 @@ const display = computed(() => (projects.value ?? []).map(p => ({
   border-left: 1px solid var(--border);
 }
 
-.proj-editorial.reverse .proj-info {
-  border-left: none;
-  border-right: 1px solid var(--border);
-}
+.proj-editorial.reverse .proj-info { border-left: none; border-right: 1px solid var(--border); }
 
 .proj-cat {
   font-family: var(--mono);
@@ -110,11 +106,7 @@ const display = computed(() => (projects.value ?? []).map(p => ({
   line-height: 1.2;
 }
 
-.proj-p {
-  font-size: 0.85rem;
-  line-height: 1.7;
-  margin-bottom: 2rem;
-}
+.proj-p { font-size: 0.85rem; line-height: 1.7; margin-bottom: 2rem; }
 
 .proj-link {
   font-family: var(--mono);
@@ -126,4 +118,23 @@ const display = computed(() => (projects.value ?? []).map(p => ({
 }
 
 .proj-link:hover { text-decoration: underline; }
+
+@media (max-width: 768px) {
+  #projects { padding: 2rem 1.5rem 4rem; }
+
+  .proj-editorial {
+    grid-template-columns: 1fr;
+    direction: ltr;
+  }
+
+  .proj-editorial.reverse { direction: ltr; }
+
+  .proj-visual { min-height: 140px; }
+  .proj-visual-inner { font-size: 5rem; }
+
+  .proj-info { padding: 1.5rem; border-left: none; border-top: 1px solid var(--border); }
+  .proj-editorial.reverse .proj-info { border-right: none; border-top: 1px solid var(--border); }
+
+  .proj-h { font-size: 1.4rem; }
+}
 </style>

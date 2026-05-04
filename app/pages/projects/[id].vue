@@ -46,23 +46,6 @@ const display = computed(() => {
         <p class="detail-lead">{{ display!.description }}</p>
       </header>
 
-      <section v-if="project!.collaborators?.length" class="detail-section">
-        <h2 class="detail-section-label">{{ t.project.collaborators }}</h2>
-        <div class="collab-list">
-          <a
-            v-for="(c, i) in project!.collaborators"
-            :key="i"
-            :href="c.linkedinUrl || '#'"
-            target="_blank"
-            rel="noopener"
-            class="collab-card"
-          >
-            <span class="collab-name">{{ c.name }}</span>
-            <span class="collab-li">LinkedIn →</span>
-          </a>
-        </div>
-      </section>
-
       <section v-if="project!.photos?.length" class="detail-section">
         <h2 class="detail-section-label">{{ t.project.photos }}</h2>
         <div class="photos-grid">
@@ -89,6 +72,23 @@ const display = computed(() => {
           {{ t.project.viewProject }}
         </a>
       </div>
+
+      <section v-if="project!.collaborators?.length" class="detail-section detail-collabs">
+        <h2 class="detail-section-label">{{ t.project.collaborators }}</h2>
+        <div class="collab-list">
+          <a
+            v-for="(c, i) in project!.collaborators"
+            :key="i"
+            :href="c.linkedinUrl || '#'"
+            target="_blank"
+            rel="noopener"
+            class="collab-card"
+          >
+            <span class="collab-name">{{ c.name }}</span>
+            <span class="collab-li">LinkedIn →</span>
+          </a>
+        </div>
+      </section>
     </main>
 
     <AppFooter />
@@ -212,5 +212,35 @@ const display = computed(() => {
   margin-top: 3rem;
   padding-top: 3rem;
   border-top: 1px solid var(--border);
+}
+
+.detail-collabs {
+  margin-top: 3rem;
+  padding-top: 3rem;
+  border-top: 1px solid var(--border);
+}
+
+.btn {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 1rem 2rem;
+  transition: opacity 0.2s;
+}
+
+.btn-red { background: var(--accent); color: var(--white); }
+.btn-red:hover { opacity: 0.85; }
+
+@media (max-width: 768px) {
+  .detail-main { padding: 4rem 1.5rem 5rem; }
+  .back-link { margin-bottom: 2rem; }
+  .detail-header { margin-bottom: 2.5rem; padding-bottom: 2.5rem; }
+  .detail-section { margin-bottom: 2.5rem; }
+  .photos-grid { grid-template-columns: 1fr; }
+  .collab-list { flex-direction: column; }
+  .collab-card { width: 100%; }
 }
 </style>

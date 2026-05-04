@@ -21,4 +21,8 @@ footer {
   font-size: 0.62rem;
   color: var(--border);
 }
+
+@media (max-width: 768px) {
+  footer { padding: 1.5rem; flex-direction: column; gap: 0.5rem; }
+}
 </style>

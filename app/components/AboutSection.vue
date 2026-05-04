@@ -5,7 +5,6 @@ const certifications = [
   { name: 'SEC0 - TryHackMe', year: '2026' },
   { name: 'SEC1 - TryHackMe', year: '2026' },
   { name: 'Cybersecurity Bachelor (in progress) - Howest', year: '2023-2026' },
-
 ]
 </script>
 
@@ -21,11 +20,7 @@ const certifications = [
 
       <div>
         <div class="cert-list">
-          <div
-            v-for="cert in certifications"
-            :key="cert.name"
-            class="cert-entry"
-          >
+          <div v-for="cert in certifications" :key="cert.name" class="cert-entry">
             <span class="cert-entry-name">{{ cert.name }}</span>
             <span class="cert-entry-yr">{{ cert.year }}</span>
           </div>
@@ -44,7 +39,7 @@ const certifications = [
 
 .about-hero-text {
   font-family: var(--display);
-  font-size: clamp(2rem, 4vw, 3.5rem);
+  font-size: clamp(1.8rem, 4vw, 3.5rem);
   color: var(--white);
   line-height: 1.2;
   font-weight: 700;
@@ -52,10 +47,7 @@ const certifications = [
   margin-bottom: 4rem;
 }
 
-.about-hero-text :deep(em) {
-  color: var(--accent);
-  font-style: italic;
-}
+.about-hero-text :deep(em) { color: var(--accent); font-style: italic; }
 
 .about-cols {
   display: grid;
@@ -63,35 +55,27 @@ const certifications = [
   gap: 5rem;
 }
 
-.about-cols p {
-  font-size: 0.9rem;
-  line-height: 1.8;
-  margin-bottom: 1rem;
-}
+.about-cols p { font-size: 0.9rem; line-height: 1.8; margin-bottom: 1rem; }
 
-.cert-list {
-  margin-top: 0.5rem;
-}
+.cert-list { margin-top: 0.5rem; }
 
 .cert-entry {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   padding: 1rem 0;
   border-bottom: 1px solid var(--border);
   font-size: 0.85rem;
+  gap: 1rem;
 }
 
-.cert-entry:first-child {
-  border-top: 1px solid var(--border);
-}
+.cert-entry:first-child { border-top: 1px solid var(--border); }
+.cert-entry-name { color: var(--white); }
+.cert-entry-yr { font-family: var(--mono); font-size: 0.65rem; color: var(--accent); flex-shrink: 0; }
 
-.cert-entry-name {
-  color: var(--white);
-}
-
-.cert-entry-yr {
-  font-family: var(--mono);
-  font-size: 0.65rem;
-  color: var(--accent);
+@media (max-width: 768px) {
+  #about { padding: 4rem 1.5rem; }
+  .about-cols { grid-template-columns: 1fr; gap: 2.5rem; }
+  .about-hero-text { margin-bottom: 2.5rem; }
 }
 </style>

@@ -1,8 +1,5 @@
 <script setup lang="ts">
-defineProps<{
-  num: string
-  title: string
-}>()
+defineProps<{ num: string; title: string }>()
 </script>
 
 <template>
@@ -21,17 +18,10 @@ defineProps<{
   align-items: center;
 }
 
-.chapter-num {
-  font-family: var(--mono);
-  font-size: 0.65rem;
-  color: var(--border);
-}
+.chapter-num { font-family: var(--mono); font-size: 0.65rem; color: var(--border); }
+.chapter-title { font-family: var(--mono); font-size: 0.65rem; color: var(--text); letter-spacing: 0.15em; text-transform: uppercase; }
 
-.chapter-title {
-  font-family: var(--mono);
-  font-size: 0.65rem;
-  color: var(--text);
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
+@media (max-width: 768px) {
+  .chapter { padding: 1.25rem 1.5rem; }
 }
 </style>
