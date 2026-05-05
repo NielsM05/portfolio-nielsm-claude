@@ -21,12 +21,18 @@ const translations = {
     chapters: ['Identification', 'Proof of work', 'Capabilities', 'Activity', 'Connection'],
     about: {
       intro: 'I am <em>Niels Maes</em> — a cybersecurity specialist who believes the best defense starts with thinking like an attacker.',
-      p1: 'With years of experience in both offensive and defensive security, I help companies, governments, and individuals make their digital environment demonstrably safer. No generic advice — concrete findings, clear reports, and actionable solutions.',
-      p2: 'My specialty lies in web applications, network security, and social engineering assessments. I think like an attacker, but work as a trusted advisor.',
+      p1: 'Currently in my third year of cybersecurity studies, with hands-on experience as a security engineer at AZ Sint-Jan hospital in Bruges. I focus on the defensive side of security — monitoring systems, detecting threats, and keeping incidents under control.',
+      p2: 'My interest lies in SOC operations and the legal side of cybersecurity — from compliance frameworks to the regulations that shape how organisations handle security. I am actively building my portfolio and looking for my first professional step in defensive security.',
     },
     skills: {
       sub: 'A combination of offensive and defensive techniques — built through years of hands-on experience and continuous learning.',
       groups: ['Offensive', 'Defensive', 'Tools', 'Code'],
+    },
+    projects: {
+      eyebrow: 'Selected work',
+      title: 'What I',
+      titleEm: 'build',
+      sub: 'Cybersecurity projects, research and tools — from penetration testing to infrastructure.',
     },
     events: {
       eyebrow: 'Blog & Events',
@@ -78,12 +84,18 @@ const translations = {
     chapters: ['Identificatie', 'Bewijs van werk', 'Capaciteiten', 'Activiteit', 'Verbinding'],
     about: {
       intro: 'Ik ben <em>Niels Maes</em> — een cybersecurity specialist die gelooft dat de beste verdediging begint met denken als een aanvaller.',
-      p1: 'Met jaren ervaring in zowel offensieve als defensieve security help ik bedrijven, overheden en individuen hun digitale omgeving aantoonbaar veiliger te maken. Geen generieke adviezen — concrete bevindingen, duidelijke rapportages en haalbare oplossingen.',
-      p2: 'Mijn specialiteit ligt in webapplicaties, netwerksecurity en social engineering assessments. Ik denk als een aanvaller, maar werk als een trusted advisor.',
+      p1: 'Momenteel in mijn derde jaar cybersecurity, met praktijkervaring als security engineer bij het AZ Sint-Jan ziekenhuis in Brugge. Ik focus op de defensieve kant van security — systemen monitoren, dreigingen detecteren en incidenten beheersen.',
+      p2: 'Mijn interesse gaat uit naar SOC-werk en de juridische kant van cybersecurity — van compliance-kaders tot de wetgeving die bepaalt hoe organisaties met security omgaan. Ik bouw actief mijn portfolio op en ben op zoek naar mijn eerste professionele stap in defensieve security.',
     },
     skills: {
       sub: 'Een combinatie van offensieve en defensieve technieken — opgebouwd door jarenlange praktijkervaring en continue bijscholing.',
       groups: ['Offensief', 'Defensief', 'Tools', 'Code'],
+    },
+    projects: {
+      eyebrow: 'Geselecteerd werk',
+      title: 'Wat ik',
+      titleEm: 'bouw',
+      sub: 'Cybersecurity projecten, onderzoek en tools — van penetration testing tot infrastructuur.',
     },
     events: {
       eyebrow: 'Blog & Events',

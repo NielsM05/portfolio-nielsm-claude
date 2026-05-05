@@ -19,6 +19,14 @@ const display = computed(() => (projects.value ?? []).map(p => ({
 
 <template>
   <section id="projects">
+    <div class="proj-header reveal">
+      <div>
+        <div class="proj-eyebrow">{{ t.projects.eyebrow }}</div>
+        <h2 class="proj-title">{{ t.projects.title }}<br><em>{{ t.projects.titleEm }}</em></h2>
+      </div>
+      <p class="proj-sub">{{ t.projects.sub }}</p>
+    </div>
+
     <div
       v-for="(project, i) in display"
       :key="project.id"
@@ -45,6 +53,44 @@ const display = computed(() => (projects.value ?? []).map(p => ({
   padding: 4rem 4rem 8rem;
   max-width: 1200px;
   margin: 0 auto;
+}
+
+.proj-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 3rem;
+  gap: 2rem;
+}
+
+.proj-eyebrow {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  color: var(--accent);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+}
+
+.proj-title {
+  font-family: var(--display);
+  font-size: 3rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--white);
+}
+
+.proj-title em {
+  font-style: italic;
+  color: var(--accent);
+}
+
+.proj-sub {
+  max-width: 340px;
+  font-size: 0.85rem;
+  line-height: 1.7;
+  color: var(--muted);
+  flex-shrink: 0;
 }
 
 .proj-editorial {
@@ -121,6 +167,10 @@ const display = computed(() => (projects.value ?? []).map(p => ({
 
 @media (max-width: 768px) {
   #projects { padding: 2rem 1.5rem 4rem; }
+
+  .proj-header { flex-direction: column; align-items: flex-start; }
+  .proj-title { font-size: 2rem; }
+  .proj-sub { max-width: 100%; }
 
   .proj-editorial {
     grid-template-columns: 1fr;
