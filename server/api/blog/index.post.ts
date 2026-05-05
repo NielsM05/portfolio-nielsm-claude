@@ -10,6 +10,7 @@ interface BlogPost {
   title_nl: string
   summary_en: string
   summary_nl: string
+  blocks: unknown[]
   content_en: string
   content_nl: string
 }
@@ -27,8 +28,9 @@ export default defineEventHandler(async (event) => {
     title_nl: body.title_nl ?? '',
     summary_en: body.summary_en ?? '',
     summary_nl: body.summary_nl ?? '',
-    content_en: body.content_en ?? '',
-    content_nl: body.content_nl ?? '',
+    blocks: body.blocks ?? [],
+    content_en: '',
+    content_nl: '',
   }
   posts.push(newPost)
   await writeData('blog', posts)

@@ -22,13 +22,21 @@ interface Event {
   linkedinUrl: string
 }
 
+interface Block {
+  type: 'text' | 'image'
+  content_en?: string; content_nl?: string
+  path?: string
+  caption_en?: string; caption_nl?: string
+}
+
 interface BlogPost {
   id: number
   date_iso: string
   date_en: string; date_nl: string
   title_en: string; title_nl: string
   summary_en: string; summary_nl: string
-  content_en: string; content_nl: string
+  blocks?: Block[]
+  content_en?: string; content_nl?: string
 }
 
 interface ExperienceEntry {
@@ -42,6 +50,11 @@ interface Config {
   about_extra_en?: string
   about_extra_nl?: string
   experience?: ExperienceEntry[]
+  giscus_enabled?: boolean
+  giscus_repo?: string
+  giscus_repo_id?: string
+  giscus_category?: string
+  giscus_category_id?: string
 }
 
 // Auth
@@ -101,6 +114,11 @@ async function loadAll() {
     about_extra_en: c.about_extra_en ?? '',
     about_extra_nl: c.about_extra_nl ?? '',
     experience: (c.experience ?? []).map(e => ({ ...e })),
+    giscus_enabled: c.giscus_enabled ?? false,
+    giscus_repo: c.giscus_repo ?? '',
+    giscus_repo_id: c.giscus_repo_id ?? '',
+    giscus_category: c.giscus_category ?? '',
+    giscus_category_id: c.giscus_category_id ?? '',
   }
 }
 
@@ -264,7 +282,7 @@ function emptyBlogForm() {
     date_en: '', date_nl: '',
     title_en: '', title_nl: '',
     summary_en: '', summary_nl: '',
-    content_en: '', content_nl: '',
+    blocks: [] as Block[],
   }
 }
 const blogForm = ref(emptyBlogForm())
@@ -282,7 +300,11 @@ function startEditBlog(p: BlogPost) {
     date_en: p.date_en, date_nl: p.date_nl,
     title_en: p.title_en, title_nl: p.title_nl,
     summary_en: p.summary_en, summary_nl: p.summary_nl,
-    content_en: p.content_en, content_nl: p.content_nl,
+    blocks: p.blocks?.length
+      ? p.blocks.map(b => ({ ...b }))
+      : (p.content_en || p.content_nl)
+        ? [{ type: 'text' as const, content_en: p.content_en ?? '', content_nl: p.content_nl ?? '' }]
+        : [],
   }
   showBlogForm.value = true
 }
@@ -312,12 +334,54 @@ async function deleteBlog(id: number) {
   blogPosts.value = blogPosts.value.filter(p => p.id !== id)
 }
 
+// ─── Blog blocks ──────────────────────────────────────────
+const blockImageUploading = ref<Record<number, boolean>>({})
+
+function addTextBlock() {
+  blogForm.value.blocks.push({ type: 'text', content_en: '', content_nl: '' })
+}
+
+function addImageBlock() {
+  blogForm.value.blocks.push({ type: 'image', path: '', caption_en: '', caption_nl: '' })
+}
+
+function removeBlock(idx: number) {
+  blogForm.value.blocks.splice(idx, 1)
+}
+
+function moveBlock(idx: number, dir: -1 | 1) {
+  const blocks = blogForm.value.blocks
+  const target = idx + dir
+  if (target < 0 || target >= blocks.length) return
+  ;[blocks[idx], blocks[target]] = [blocks[target], blocks[idx]]
+}
+
+async function uploadBlockImage(idx: number, e: Event) {
+  const file = (e.target as HTMLInputElement).files?.[0]
+  if (!file) return
+  blockImageUploading.value = { ...blockImageUploading.value, [idx]: true }
+  try {
+    const form = new FormData()
+    form.append('file', file)
+    const { url } = await $fetch<{ url: string }>('/api/upload', { method: 'POST', body: form })
+    blogForm.value.blocks[idx].path = url
+  } finally {
+    blockImageUploading.value = { ...blockImageUploading.value, [idx]: false }
+    ;(e.target as HTMLInputElement).value = ''
+  }
+}
+
 // ─── About / CV ───────────────────────────────────────────
 const aboutForm = ref({
   cv_url: '',
   about_extra_en: '',
   about_extra_nl: '',
   experience: [] as ExperienceEntry[],
+  giscus_enabled: false,
+  giscus_repo: '',
+  giscus_repo_id: '',
+  giscus_category: '',
+  giscus_category_id: '',
 })
 const aboutSaving = ref(false)
 const cvUploading = ref(false)
@@ -607,6 +671,25 @@ function removeExperience(idx: number) { aboutForm.value.experience.splice(idx, 
             <button class="btn-ghost btn-sm" type="button" style="margin-top:0.75rem;" @click="addExperience">+ Ervaring toevoegen</button>
           </div>
 
+          <!-- Giscus -->
+          <div class="form-block">
+            <div class="form-block-label">Comments (Giscus)</div>
+            <p style="font-size:0.8rem;line-height:1.6;color:var(--text);margin-bottom:1rem;">
+              Ga naar <strong style="color:var(--white)">giscus.app</strong>, koppel je GitHub-repo en vul de waarden in.
+              Bezoekers reageren via hun GitHub-account.
+            </p>
+            <label style="display:flex;align-items:center;gap:0.75rem;font-family:var(--mono);font-size:0.55rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--text);margin-bottom:1.25rem;cursor:pointer;">
+              <input v-model="aboutForm.giscus_enabled" type="checkbox" style="accent-color:var(--accent);width:14px;height:14px;flex-shrink:0" />
+              Comments inschakelen
+            </label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+              <label class="form-label">Repo <span class="form-hint">(username/repo)</span><input v-model="aboutForm.giscus_repo" type="text" class="field" placeholder="nielsm/portfolio" /></label>
+              <label class="form-label">Repo ID<input v-model="aboutForm.giscus_repo_id" type="text" class="field" placeholder="R_…" /></label>
+              <label class="form-label">Category<input v-model="aboutForm.giscus_category" type="text" class="field" placeholder="Announcements" /></label>
+              <label class="form-label">Category ID<input v-model="aboutForm.giscus_category_id" type="text" class="field" placeholder="DIC_…" /></label>
+            </div>
+          </div>
+
           <div class="form-actions">
             <button class="btn-action" :disabled="aboutSaving" @click="saveAbout">{{ aboutSaving ? 'Opslaan…' : 'Opslaan' }}</button>
           </div>
@@ -634,14 +717,64 @@ function removeExperience(idx: number) { aboutForm.value.experience.splice(idx, 
               <label class="form-label">Date (display)<input v-model="blogForm.date_en" type="text" class="field" placeholder="April 15, 2025" /></label>
               <label class="form-label">Title<input v-model="blogForm.title_en" type="text" class="field" placeholder="Post title" /></label>
               <label class="form-label">Summary <span class="form-hint">(shown in list)</span><textarea v-model="blogForm.summary_en" class="field field-textarea" placeholder="Short teaser…" /></label>
-              <label class="form-label">Content <span class="form-hint">(full post, double newline = new paragraph)</span><textarea v-model="blogForm.content_en" class="field field-textarea field-lg" placeholder="Write your post…" /></label>
             </div>
             <div class="lang-col">
               <div class="lang-tag">NL</div>
               <label class="form-label">Datum (weergave)<input v-model="blogForm.date_nl" type="text" class="field" placeholder="15 april 2025" /></label>
               <label class="form-label">Titel<input v-model="blogForm.title_nl" type="text" class="field" placeholder="Posttitel" /></label>
               <label class="form-label">Samenvatting <span class="form-hint">(zichtbaar in lijst)</span><textarea v-model="blogForm.summary_nl" class="field field-textarea" placeholder="Korte teaser…" /></label>
-              <label class="form-label">Inhoud <span class="form-hint">(volledige post, dubbele newline = nieuwe alinea)</span><textarea v-model="blogForm.content_nl" class="field field-textarea field-lg" placeholder="Schrijf je post…" /></label>
+            </div>
+          </div>
+
+          <!-- Block editor -->
+          <div class="form-block">
+            <div class="form-block-label">Inhoud</div>
+
+            <div v-for="(block, idx) in blogForm.blocks" :key="idx" class="blog-block">
+              <div class="block-head">
+                <span class="block-type-badge">{{ block.type === 'text' ? 'Tekst' : 'Afbeelding' }}</span>
+                <div class="block-controls">
+                  <button class="btn-icon btn-sm" type="button" :disabled="idx === 0" @click="moveBlock(idx, -1)">↑</button>
+                  <button class="btn-icon btn-sm" type="button" :disabled="idx === blogForm.blocks.length - 1" @click="moveBlock(idx, 1)">↓</button>
+                  <button class="btn-icon btn-icon-danger btn-sm" type="button" @click="removeBlock(idx)">×</button>
+                </div>
+              </div>
+
+              <div v-if="block.type === 'text'" class="bilingual-grid" style="margin-bottom:0">
+                <div class="lang-col">
+                  <div class="lang-tag">EN</div>
+                  <textarea v-model="block.content_en" class="field field-textarea" placeholder="Paragraph text…" />
+                </div>
+                <div class="lang-col">
+                  <div class="lang-tag">NL</div>
+                  <textarea v-model="block.content_nl" class="field field-textarea" placeholder="Alineatekst…" />
+                </div>
+              </div>
+
+              <div v-else class="image-block-editor">
+                <div v-if="block.path" class="block-img-preview">
+                  <img :src="block.path" alt="Block afbeelding" />
+                </div>
+                <label class="photo-add photo-add-wide" :class="{ loading: blockImageUploading[idx] }">
+                  <input type="file" accept="image/*" class="photo-input" :disabled="!!blockImageUploading[idx]" @change="uploadBlockImage(idx, $event)" />
+                  <span>{{ blockImageUploading[idx] ? 'Uploaden…' : block.path ? '↺ Vervang afbeelding' : '+ Upload afbeelding' }}</span>
+                </label>
+                <div class="bilingual-grid" style="margin-bottom:0;margin-top:0.75rem">
+                  <div class="lang-col">
+                    <div class="lang-tag">EN</div>
+                    <label class="form-label">Caption (optional)<input v-model="block.caption_en" type="text" class="field" placeholder="Image caption…" /></label>
+                  </div>
+                  <div class="lang-col">
+                    <div class="lang-tag">NL</div>
+                    <label class="form-label">Bijschrift (optioneel)<input v-model="block.caption_nl" type="text" class="field" placeholder="Afbeeldingsbijschrift…" /></label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="block-add-row">
+              <button class="btn-ghost btn-sm" type="button" @click="addTextBlock">+ Tekst toevoegen</button>
+              <button class="btn-ghost btn-sm" type="button" @click="addImageBlock">+ Afbeelding toevoegen</button>
             </div>
           </div>
 
@@ -764,4 +897,15 @@ function removeExperience(idx: number) { aboutForm.value.experience.splice(idx, 
 .btn-icon { font-family: var(--mono); font-size: 0.55rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.4rem 0.8rem; background: transparent; color: var(--text); border: 1px solid var(--border); cursor: pointer; transition: all 0.2s; white-space: nowrap; text-decoration: none; display: inline-block; }
 .btn-icon:hover { border-color: var(--white); color: var(--white); }
 .btn-icon-danger:hover { border-color: var(--accent); color: var(--accent); }
+
+/* Blog block editor */
+.blog-block { border: 1px solid var(--border); padding: 1rem; margin-bottom: 0.75rem; }
+.block-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
+.block-type-badge { font-family: var(--mono); font-size: 0.55rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); }
+.block-controls { display: flex; gap: 0.25rem; }
+.block-add-row { display: flex; gap: 0.75rem; margin-top: 0.75rem; }
+.image-block-editor { display: flex; flex-direction: column; gap: 0.75rem; }
+.block-img-preview { width: 100%; overflow: hidden; background: var(--bg); border: 1px solid var(--border); }
+.block-img-preview img { width: 100%; max-height: 220px; object-fit: contain; display: block; }
+.photo-add-wide { width: auto; height: 48px; padding: 0 1.25rem; }
 </style>

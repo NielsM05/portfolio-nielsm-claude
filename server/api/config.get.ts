@@ -13,6 +13,11 @@ const defaults = {
     company: string; date_from: string; date_to: string; tag: string
     description_en: string; description_nl: string
   }[],
+  giscus_enabled: false,
+  giscus_repo: '',
+  giscus_repo_id: '',
+  giscus_category: '',
+  giscus_category_id: '',
 }
 
 export default defineEventHandler(async () => {
