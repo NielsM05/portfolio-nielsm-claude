@@ -9,9 +9,12 @@ services:
     environment:
       - ADMIN_PASSWORD=${ADMIN_PASSWORD}
     volumes:
-      - ./data:/app/data
+      - portfolio_data:/app/data
     restart: unless-stopped
 
 networks:
   scoobydoo:
     external: true
+
+volumes:
+  portfolio_data:
