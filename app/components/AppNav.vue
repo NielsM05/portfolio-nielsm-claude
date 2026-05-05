@@ -21,6 +21,7 @@ function closeMenu() { isMenuOpen.value = false }
       <li><a href="/#projects" @click="closeMenu">{{ t.nav.projects }}</a></li>
       <li><a href="/#skills" @click="closeMenu">{{ t.nav.skills }}</a></li>
       <li><a href="/#events" @click="closeMenu">{{ t.nav.events }}</a></li>
+      <li><NuxtLink to="/blog" @click="closeMenu">{{ t.nav.blog }}</NuxtLink></li>
       <li><a href="/#contact" @click="closeMenu">{{ t.nav.contact }}</a></li>
     </ul>
 

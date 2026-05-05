@@ -29,7 +29,16 @@
       "Bash(git -C /Users/niels/Development/WebProjecten/portfolio-nielsm-claude add docker-compose.yml)",
       "Bash(git *)",
       "Bash(claude doctor *)",
-      "Bash(echo \"PID: $!\")"
+      "Bash(echo \"PID: $!\")",
+      "Bash(npx nuxi *)",
+      "Bash(curl -s http://localhost:3000/blog)",
+      "Bash(curl -s http://localhost:3000/events)",
+      "Bash(curl -s http://localhost:3000/api/blog)",
+      "Bash(curl -s http://localhost:3000/api/events)",
+      "Bash(curl -s http://localhost:3000/projects)",
+      "Bash(curl -s http://localhost:3000/about)",
+      "Bash(curl -s http://localhost:3000/api/config)",
+      "Bash(curl -sv http://localhost:3000/about)"
     ]
   }
 }

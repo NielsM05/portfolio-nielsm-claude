@@ -9,7 +9,7 @@ interface Project {
 const { locale, t } = useLocale()
 const { data: projects } = await useFetch<Project[]>('/api/projects')
 
-const display = computed(() => (projects.value ?? []).map(p => ({
+const display = computed(() => (projects.value ?? []).slice(0, 3).map(p => ({
   id: p.id,
   category: p[`category_${locale.value}` as keyof Project] as string || p.category_en,
   title:    p[`title_${locale.value}` as keyof Project] as string    || p.title_en,
@@ -44,6 +44,10 @@ const display = computed(() => (projects.value ?? []).map(p => ({
         </div>
         <NuxtLink :to="`/projects/${project.id}`" class="proj-link">{{ t.project.readMore }}</NuxtLink>
       </div>
+    </div>
+
+    <div class="proj-footer reveal">
+      <NuxtLink to="/projects" class="see-all-link">{{ t.projects.seeAll }}</NuxtLink>
     </div>
   </section>
 </template>
@@ -164,6 +168,22 @@ const display = computed(() => (projects.value ?? []).map(p => ({
 }
 
 .proj-link:hover { text-decoration: underline; }
+
+.proj-footer { padding-top: 2.5rem; }
+
+.see-all-link {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  color: var(--accent);
+  text-decoration: none;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--accent);
+  padding-bottom: 0.15rem;
+  transition: opacity 0.2s;
+}
+
+.see-all-link:hover { opacity: 0.7; }
 
 @media (max-width: 768px) {
   #projects { padding: 2rem 1.5rem 4rem; }

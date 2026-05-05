@@ -4,9 +4,11 @@ const translations = {
   en: {
     nav: {
       about: 'About',
+      aboutPage: 'About me',
       projects: 'Projects',
       skills: 'Skills',
       events: 'Events',
+      blog: 'Blog',
       contact: 'Contact',
     },
     hero: {
@@ -23,6 +25,10 @@ const translations = {
       intro: 'I am <em>Niels Maes</em> — a cybersecurity specialist who believes the best defense starts with thinking like an attacker.',
       p1: 'Currently in my third year of cybersecurity studies, with hands-on experience as a security engineer at AZ Sint-Jan hospital in Bruges. I focus on the defensive side of security — monitoring systems, detecting threats, and keeping incidents under control.',
       p2: 'My interest lies in SOC operations and the legal side of cybersecurity — from compliance frameworks to the regulations that shape how organisations handle security. I am actively building my portfolio and looking for my first professional step in defensive security.',
+      learnMore: 'Learn more about me →',
+      downloadCv: 'Download CV',
+      experienceTitle: 'Experience',
+      extraTitle: 'More about me',
     },
     skills: {
       sub: 'A combination of offensive and defensive techniques — built through years of hands-on experience and continuous learning.',
@@ -33,6 +39,7 @@ const translations = {
       title: 'What I',
       titleEm: 'build',
       sub: 'Cybersecurity projects, research and tools — from penetration testing to infrastructure.',
+      seeAll: 'See all projects →',
     },
     events: {
       eyebrow: 'Blog & Events',
@@ -40,6 +47,16 @@ const translations = {
       titleEm: 'share',
       sub: 'Talks, workshops, and insights — also available via',
       linkedin: 'View on LinkedIn →',
+      seeAll: 'See all events →',
+    },
+    blog: {
+      eyebrow: 'Blog',
+      title: 'My',
+      titleEm: 'findings',
+      sub: 'Write-ups, research notes and reflections on cybersecurity topics.',
+      readMore: 'Read more →',
+      back: '← Back to blog',
+      empty: 'No posts yet.',
     },
     contact: {
       big: 'Ready to<br>work <em>together?</em>',
@@ -67,9 +84,11 @@ const translations = {
   nl: {
     nav: {
       about: 'Over',
+      aboutPage: 'Over mij',
       projects: 'Projecten',
       skills: 'Skills',
       events: 'Events',
+      blog: 'Blog',
       contact: 'Contact',
     },
     hero: {
@@ -86,6 +105,10 @@ const translations = {
       intro: 'Ik ben <em>Niels Maes</em> — een cybersecurity specialist die gelooft dat de beste verdediging begint met denken als een aanvaller.',
       p1: 'Momenteel in mijn derde jaar cybersecurity, met praktijkervaring als security engineer bij het AZ Sint-Jan ziekenhuis in Brugge. Ik focus op de defensieve kant van security — systemen monitoren, dreigingen detecteren en incidenten beheersen.',
       p2: 'Mijn interesse gaat uit naar SOC-werk en de juridische kant van cybersecurity — van compliance-kaders tot de wetgeving die bepaalt hoe organisaties met security omgaan. Ik bouw actief mijn portfolio op en ben op zoek naar mijn eerste professionele stap in defensieve security.',
+      learnMore: 'Leer meer over mij →',
+      downloadCv: 'CV downloaden',
+      experienceTitle: 'Ervaring',
+      extraTitle: 'Meer over mij',
     },
     skills: {
       sub: 'Een combinatie van offensieve en defensieve technieken — opgebouwd door jarenlange praktijkervaring en continue bijscholing.',
@@ -96,6 +119,7 @@ const translations = {
       title: 'Wat ik',
       titleEm: 'bouw',
       sub: 'Cybersecurity projecten, onderzoek en tools — van penetration testing tot infrastructuur.',
+      seeAll: 'Alle projecten bekijken →',
     },
     events: {
       eyebrow: 'Blog & Events',
@@ -103,6 +127,16 @@ const translations = {
       titleEm: 'deel',
       sub: 'Spreekbeurten, workshops en inzichten — ook te volgen via',
       linkedin: 'Bekijk op LinkedIn →',
+      seeAll: 'Alle events bekijken →',
+    },
+    blog: {
+      eyebrow: 'Blog',
+      title: 'Mijn',
+      titleEm: 'bevindingen',
+      sub: 'Write-ups, onderzoeksnotities en reflecties over cybersecurity.',
+      readMore: 'Lees meer →',
+      back: '← Terug naar blog',
+      empty: 'Nog geen posts.',
     },
     contact: {
       big: 'Klaar om<br>samen te <em>werken?</em>',

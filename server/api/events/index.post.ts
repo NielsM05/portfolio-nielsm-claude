@@ -3,6 +3,7 @@ import { requireAuth } from '../../utils/auth'
 
 interface Event {
   id: number
+  date_iso: string
   date_en: string
   date_nl: string
   type_en: string
@@ -20,6 +21,7 @@ export default defineEventHandler(async (event) => {
   const events = await readData<Event>('events')
   const newEvent: Event = {
     id: events.length ? Math.max(...events.map(e => e.id)) + 1 : 1,
+    date_iso: body.date_iso ?? '',
     date_en: body.date_en ?? '',
     date_nl: body.date_nl ?? '',
     type_en: body.type_en ?? '',

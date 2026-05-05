@@ -11,7 +11,7 @@ interface Event {
 const { locale, t } = useLocale()
 const { data: events } = await useFetch<Event[]>('/api/events')
 
-const display = computed(() => (events.value ?? []).map(e => ({
+const display = computed(() => (events.value ?? []).slice(0, 3).map(e => ({
   id: e.id,
   linkedinUrl: e.linkedinUrl,
   date:        e[`date_${locale.value}` as keyof Event] as string        || e.date_en,
@@ -19,6 +19,7 @@ const display = computed(() => (events.value ?? []).map(e => ({
   title:       e[`title_${locale.value}` as keyof Event] as string       || e.title_en,
   description: e[`description_${locale.value}` as keyof Event] as string || e.description_en,
 })))
+
 </script>
 
 <template>
@@ -49,6 +50,10 @@ const display = computed(() => (events.value ?? []).map(e => ({
             {{ t.events.linkedin }}
           </a>
         </article>
+      </div>
+
+      <div class="events-footer reveal">
+        <NuxtLink to="/events" class="see-all-link">{{ t.events.seeAll }}</NuxtLink>
       </div>
     </div>
   </section>
@@ -101,6 +106,22 @@ const display = computed(() => (events.value ?? []).map(e => ({
 
 .event-link { font-family: var(--mono); font-size: 0.6rem; color: var(--text); text-decoration: none; letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap; transition: color 0.2s; flex-shrink: 0; }
 .event-link:hover { color: var(--accent); }
+
+.events-footer { padding-top: 2.5rem; }
+
+.see-all-link {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  color: var(--accent);
+  text-decoration: none;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--accent);
+  padding-bottom: 0.15rem;
+  transition: opacity 0.2s;
+}
+
+.see-all-link:hover { opacity: 0.7; }
 
 @media (max-width: 768px) {
   #events { padding: 4rem 1.5rem; }

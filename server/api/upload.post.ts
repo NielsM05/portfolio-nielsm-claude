@@ -2,7 +2,7 @@ import { requireAuth } from '../utils/auth'
 import { writeFile, mkdir } from 'node:fs/promises'
 import { resolve, extname } from 'node:path'
 
-const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
+const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'application/pdf']
 const MAX_SIZE = 10 * 1024 * 1024
 
 const uploadDir = resolve(
@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, message: 'Geen bestand gevonden' })
   }
   if (file.type && !ALLOWED_TYPES.includes(file.type)) {
-    throw createError({ statusCode: 400, message: 'Alleen afbeeldingen toegestaan' })
+    throw createError({ statusCode: 400, message: 'Alleen afbeeldingen en PDF toegestaan' })
   }
   if (file.data.length > MAX_SIZE) {
     throw createError({ statusCode: 400, message: 'Bestand te groot (max 10MB)' })

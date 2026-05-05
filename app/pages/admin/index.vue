@@ -14,11 +14,34 @@ interface Project {
 
 interface Event {
   id: number
+  date_iso: string
   date_en: string;  date_nl: string
   type_en: string;  type_nl: string
   title_en: string; title_nl: string
   description_en: string; description_nl: string
   linkedinUrl: string
+}
+
+interface BlogPost {
+  id: number
+  date_iso: string
+  date_en: string; date_nl: string
+  title_en: string; title_nl: string
+  summary_en: string; summary_nl: string
+  content_en: string; content_nl: string
+}
+
+interface ExperienceEntry {
+  role_en: string; role_nl: string
+  company: string; period: string
+  description_en: string; description_nl: string
+}
+
+interface Config {
+  cv_url?: string
+  about_extra_en?: string
+  about_extra_nl?: string
+  experience?: ExperienceEntry[]
 }
 
 // Auth
@@ -59,14 +82,26 @@ async function logout() {
 
 const projects = ref<Project[]>([])
 const events = ref<Event[]>([])
+const blogPosts = ref<BlogPost[]>([])
+const config = ref<Config>({})
 
 async function loadAll() {
-  const [p, e] = await Promise.all([
+  const [p, e, b, c] = await Promise.all([
     $fetch<Project[]>('/api/projects'),
     $fetch<Event[]>('/api/events'),
+    $fetch<BlogPost[]>('/api/blog'),
+    $fetch<Config>('/api/config'),
   ])
   projects.value = p
   events.value = e
+  blogPosts.value = b
+  config.value = c
+  aboutForm.value = {
+    cv_url: c.cv_url ?? '',
+    about_extra_en: c.about_extra_en ?? '',
+    about_extra_nl: c.about_extra_nl ?? '',
+    experience: (c.experience ?? []).map(e => ({ ...e })),
+  }
 }
 
 // ─── Projects ────────────────────────────────────────────
@@ -164,6 +199,7 @@ const eventSaving = ref(false)
 
 function emptyEventForm() {
   return {
+    date_iso: '',
     date_en: '',  date_nl: '',
     type_en: '',  type_nl: '',
     title_en: '', title_nl: '',
@@ -182,6 +218,7 @@ function startNewEvent() {
 function startEditEvent(ev: Event) {
   editingEventId.value = ev.id
   eventForm.value = {
+    date_iso: ev.date_iso ?? '',
     date_en: ev.date_en,   date_nl: ev.date_nl,
     type_en: ev.type_en,   type_nl: ev.type_nl,
     title_en: ev.title_en, title_nl: ev.title_nl,
@@ -215,6 +252,105 @@ async function deleteEvent(id: number) {
   await $fetch(`/api/events/${id}`, { method: 'DELETE' })
   events.value = events.value.filter(e => e.id !== id)
 }
+
+// ─── Blog ─────────────────────────────────────────────────
+const showBlogForm = ref(false)
+const editingBlogId = ref<number | null>(null)
+const blogSaving = ref(false)
+
+function emptyBlogForm() {
+  return {
+    date_iso: '',
+    date_en: '', date_nl: '',
+    title_en: '', title_nl: '',
+    summary_en: '', summary_nl: '',
+    content_en: '', content_nl: '',
+  }
+}
+const blogForm = ref(emptyBlogForm())
+
+function startNewBlog() {
+  editingBlogId.value = null
+  blogForm.value = emptyBlogForm()
+  showBlogForm.value = true
+}
+
+function startEditBlog(p: BlogPost) {
+  editingBlogId.value = p.id
+  blogForm.value = {
+    date_iso: p.date_iso ?? '',
+    date_en: p.date_en, date_nl: p.date_nl,
+    title_en: p.title_en, title_nl: p.title_nl,
+    summary_en: p.summary_en, summary_nl: p.summary_nl,
+    content_en: p.content_en, content_nl: p.content_nl,
+  }
+  showBlogForm.value = true
+}
+
+function cancelBlogForm() { showBlogForm.value = false; editingBlogId.value = null }
+
+async function saveBlog() {
+  blogSaving.value = true
+  try {
+    if (editingBlogId.value !== null) {
+      const updated = await $fetch<BlogPost>(`/api/blog/${editingBlogId.value}`, { method: 'PUT', body: blogForm.value })
+      const idx = blogPosts.value.findIndex(p => p.id === editingBlogId.value)
+      if (idx >= 0) blogPosts.value[idx] = updated
+    } else {
+      const created = await $fetch<BlogPost>('/api/blog', { method: 'POST', body: blogForm.value })
+      blogPosts.value.push(created)
+    }
+    cancelBlogForm()
+  } finally {
+    blogSaving.value = false
+  }
+}
+
+async function deleteBlog(id: number) {
+  if (!confirm('Deze blogpost verwijderen?')) return
+  await $fetch(`/api/blog/${id}`, { method: 'DELETE' })
+  blogPosts.value = blogPosts.value.filter(p => p.id !== id)
+}
+
+// ─── About / CV ───────────────────────────────────────────
+const aboutForm = ref({
+  cv_url: '',
+  about_extra_en: '',
+  about_extra_nl: '',
+  experience: [] as ExperienceEntry[],
+})
+const aboutSaving = ref(false)
+const cvUploading = ref(false)
+
+async function uploadCv(e: Event) {
+  const file = (e.target as HTMLInputElement).files?.[0]
+  if (!file) return
+  cvUploading.value = true
+  try {
+    const form = new FormData()
+    form.append('file', file)
+    const { url } = await $fetch<{ url: string }>('/api/upload', { method: 'POST', body: form })
+    aboutForm.value.cv_url = url
+  } finally {
+    cvUploading.value = false
+    ;(e.target as HTMLInputElement).value = ''
+  }
+}
+
+async function saveAbout() {
+  aboutSaving.value = true
+  try {
+    await $fetch('/api/config', { method: 'PUT', body: aboutForm.value })
+  } finally {
+    aboutSaving.value = false
+  }
+}
+
+function addExperience() {
+  aboutForm.value.experience.push({ role_en: '', role_nl: '', company: '', period: '', description_en: '', description_nl: '' })
+}
+
+function removeExperience(idx: number) { aboutForm.value.experience.splice(idx, 1) }
 </script>
 
 <template>
@@ -339,17 +475,22 @@ async function deleteEvent(id: number) {
         <div v-if="showEventForm" class="form-card">
           <h3 class="form-title">{{ editingEventId !== null ? 'Event bewerken' : 'Nieuw event' }}</h3>
 
+          <label class="form-label form-single">
+            Datum (JJJJ-MM-DD) <span class="form-hint">— voor sortering, bv. 2025-04-15</span>
+            <input v-model="eventForm.date_iso" type="date" class="field" />
+          </label>
+
           <div class="bilingual-grid">
             <div class="lang-col">
               <div class="lang-tag">EN</div>
-              <label class="form-label">Date<input v-model="eventForm.date_en" type="text" class="field" placeholder="April 15, 2025" /></label>
+              <label class="form-label">Date (display)<input v-model="eventForm.date_en" type="text" class="field" placeholder="April 15, 2025" /></label>
               <label class="form-label">Type<input v-model="eventForm.type_en" type="text" class="field" placeholder="Conference" /></label>
               <label class="form-label">Title<input v-model="eventForm.title_en" type="text" class="field" placeholder="Event title" /></label>
               <label class="form-label">Description<textarea v-model="eventForm.description_en" class="field field-textarea" placeholder="Describe the event…" /></label>
             </div>
             <div class="lang-col">
               <div class="lang-tag">NL</div>
-              <label class="form-label">Datum<input v-model="eventForm.date_nl" type="text" class="field" placeholder="15 april 2025" /></label>
+              <label class="form-label">Datum (weergave)<input v-model="eventForm.date_nl" type="text" class="field" placeholder="15 april 2025" /></label>
               <label class="form-label">Type<input v-model="eventForm.type_nl" type="text" class="field" placeholder="Conferentie" /></label>
               <label class="form-label">Titel<input v-model="eventForm.title_nl" type="text" class="field" placeholder="Evenementtitel" /></label>
               <label class="form-label">Omschrijving<textarea v-model="eventForm.description_nl" class="field field-textarea" placeholder="Beschrijf het event…" /></label>
@@ -382,6 +523,139 @@ async function deleteEvent(id: number) {
             </div>
           </div>
           <div v-if="!events.length" class="empty-state">Nog geen events.</div>
+        </div>
+      </section>
+
+      <!-- ── About / CV ── -->
+      <section class="admin-section">
+        <div class="section-head">
+          <h2 class="section-title">Over mij &amp; CV</h2>
+        </div>
+
+        <div class="form-card">
+          <!-- CV upload -->
+          <div class="form-block">
+            <div class="form-block-label">CV (PDF)</div>
+            <div class="cv-row">
+              <input
+                v-if="aboutForm.cv_url"
+                :value="aboutForm.cv_url"
+                type="text"
+                class="field cv-url-field"
+                readonly
+              />
+              <span v-else class="no-cv-yet">Nog geen CV geüpload</span>
+              <label class="photo-add" :class="{ loading: cvUploading }">
+                <input type="file" accept=".pdf,application/pdf" class="photo-input" :disabled="cvUploading" @change="uploadCv" />
+                <span>{{ cvUploading ? 'Uploaden…' : aboutForm.cv_url ? '↺ Vervang CV' : '+ Upload CV' }}</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Extra bio -->
+          <div class="bilingual-grid">
+            <div class="lang-col">
+              <div class="lang-tag">EN</div>
+              <label class="form-label">Extra bio <span class="form-hint">(dubbele enter = nieuwe alinea)</span>
+                <textarea v-model="aboutForm.about_extra_en" class="field field-textarea field-lg" placeholder="Extra informatie over jezelf…" />
+              </label>
+            </div>
+            <div class="lang-col">
+              <div class="lang-tag">NL</div>
+              <label class="form-label">Extra bio <span class="form-hint">(dubbele enter = nieuwe alinea)</span>
+                <textarea v-model="aboutForm.about_extra_nl" class="field field-textarea field-lg" placeholder="Aanvullende informatie…" />
+              </label>
+            </div>
+          </div>
+
+          <!-- Experience -->
+          <div class="form-block">
+            <div class="form-block-label">Ervaringen</div>
+            <div v-for="(exp, idx) in aboutForm.experience" :key="idx" class="exp-form-block">
+              <div class="exp-form-head">
+                <span class="exp-form-num">{{ String(idx + 1).padStart(2, '0') }}</span>
+                <button class="btn-icon btn-icon-danger btn-sm" type="button" @click="removeExperience(idx)">Verwijder</button>
+              </div>
+              <div class="bilingual-grid">
+                <div class="lang-col">
+                  <div class="lang-tag">EN</div>
+                  <label class="form-label">Role<input v-model="exp.role_en" type="text" class="field" placeholder="Security Engineer Intern" /></label>
+                  <label class="form-label">Description<textarea v-model="exp.description_en" class="field field-textarea" placeholder="What you did…" /></label>
+                </div>
+                <div class="lang-col">
+                  <div class="lang-tag">NL</div>
+                  <label class="form-label">Functie<input v-model="exp.role_nl" type="text" class="field" placeholder="Security Engineer Stage" /></label>
+                  <label class="form-label">Omschrijving<textarea v-model="exp.description_nl" class="field field-textarea" placeholder="Wat je deed…" /></label>
+                </div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-top:0.75rem;">
+                <label class="form-label">Bedrijf<input v-model="exp.company" type="text" class="field" placeholder="AZ Sint-Jan Brugge" /></label>
+                <label class="form-label">Periode<input v-model="exp.period" type="text" class="field" placeholder="2025" /></label>
+              </div>
+            </div>
+            <button class="btn-ghost btn-sm" type="button" style="margin-top:0.75rem;" @click="addExperience">+ Ervaring toevoegen</button>
+          </div>
+
+          <div class="form-actions">
+            <button class="btn-action" :disabled="aboutSaving" @click="saveAbout">{{ aboutSaving ? 'Opslaan…' : 'Opslaan' }}</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Blog ── -->
+      <section class="admin-section">
+        <div class="section-head">
+          <h2 class="section-title">Blog</h2>
+          <button class="btn-action" @click="startNewBlog">+ Nieuwe post</button>
+        </div>
+
+        <div v-if="showBlogForm" class="form-card">
+          <h3 class="form-title">{{ editingBlogId !== null ? 'Post bewerken' : 'Nieuwe post' }}</h3>
+
+          <label class="form-label form-single">
+            Datum (JJJJ-MM-DD) <span class="form-hint">— voor sortering</span>
+            <input v-model="blogForm.date_iso" type="date" class="field" />
+          </label>
+
+          <div class="bilingual-grid">
+            <div class="lang-col">
+              <div class="lang-tag">EN</div>
+              <label class="form-label">Date (display)<input v-model="blogForm.date_en" type="text" class="field" placeholder="April 15, 2025" /></label>
+              <label class="form-label">Title<input v-model="blogForm.title_en" type="text" class="field" placeholder="Post title" /></label>
+              <label class="form-label">Summary <span class="form-hint">(shown in list)</span><textarea v-model="blogForm.summary_en" class="field field-textarea" placeholder="Short teaser…" /></label>
+              <label class="form-label">Content <span class="form-hint">(full post, double newline = new paragraph)</span><textarea v-model="blogForm.content_en" class="field field-textarea field-lg" placeholder="Write your post…" /></label>
+            </div>
+            <div class="lang-col">
+              <div class="lang-tag">NL</div>
+              <label class="form-label">Datum (weergave)<input v-model="blogForm.date_nl" type="text" class="field" placeholder="15 april 2025" /></label>
+              <label class="form-label">Titel<input v-model="blogForm.title_nl" type="text" class="field" placeholder="Posttitel" /></label>
+              <label class="form-label">Samenvatting <span class="form-hint">(zichtbaar in lijst)</span><textarea v-model="blogForm.summary_nl" class="field field-textarea" placeholder="Korte teaser…" /></label>
+              <label class="form-label">Inhoud <span class="form-hint">(volledige post, dubbele newline = nieuwe alinea)</span><textarea v-model="blogForm.content_nl" class="field field-textarea field-lg" placeholder="Schrijf je post…" /></label>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button class="btn-action" :disabled="blogSaving" @click="saveBlog">{{ blogSaving ? 'Opslaan…' : 'Opslaan' }}</button>
+            <button class="btn-ghost" @click="cancelBlogForm">Annuleren</button>
+          </div>
+        </div>
+
+        <div class="item-list">
+          <div v-for="post in blogPosts" :key="post.id" class="item-row">
+            <div class="item-meta-col">
+              <div class="item-cat">Blog</div>
+              <div class="item-date">{{ post.date_en || post.date_nl }}</div>
+            </div>
+            <div class="item-info">
+              <div class="item-title">{{ post.title_en || post.title_nl }}</div>
+            </div>
+            <div class="item-actions">
+              <NuxtLink :to="`/blog/${post.id}`" target="_blank" class="btn-icon">Bekijk</NuxtLink>
+              <button class="btn-icon" @click="startEditBlog(post)">Bewerk</button>
+              <button class="btn-icon btn-icon-danger" @click="deleteBlog(post.id)">Verwijder</button>
+            </div>
+          </div>
+          <div v-if="!blogPosts.length" class="empty-state">Nog geen blogposts.</div>
         </div>
       </section>
     </div>
@@ -446,6 +720,16 @@ async function deleteEvent(id: number) {
 /* Collaborators */
 .collab-rows { display: flex; flex-direction: column; gap: 0.5rem; }
 .collab-row { display: grid; grid-template-columns: 1fr 1fr auto; gap: 0.5rem; align-items: center; }
+
+/* CV */
+.cv-row { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+.cv-url-field { flex: 1; min-width: 0; font-size: 0.75rem; color: var(--text); }
+.no-cv-yet { font-family: var(--mono); font-size: 0.6rem; color: var(--text); letter-spacing: 0.1em; }
+
+/* Experience form */
+.exp-form-block { border: 1px solid var(--border); padding: 1.25rem; margin-bottom: 0.75rem; }
+.exp-form-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+.exp-form-num { font-family: var(--mono); font-size: 0.6rem; color: var(--accent); letter-spacing: 0.1em; }
 
 /* Item list */
 .item-list { display: flex; flex-direction: column; gap: 1px; }
