@@ -17,6 +17,19 @@ const display = computed(() => (posts.value ?? []).map(p => ({
   title:   p[`title_${locale.value}` as keyof BlogPost] as string   || p.title_en,
   summary: p[`summary_${locale.value}` as keyof BlogPost] as string || p.summary_en,
 })))
+
+const subEmail = ref('')
+const subState = ref<'idle' | 'loading' | 'success' | 'error'>('idle')
+
+async function handleSubscribe() {
+  subState.value = 'loading'
+  try {
+    await $fetch('/api/subscribe', { method: 'POST', body: { email: subEmail.value } })
+    subState.value = 'success'
+  } catch {
+    subState.value = 'error'
+  }
+}
 </script>
 
 <template>
@@ -39,6 +52,27 @@ const display = computed(() => (posts.value ?? []).map(p => ({
           <NuxtLink :to="`/blog/${post.id}`" class="post-link">{{ t.blog.readMore }}</NuxtLink>
         </article>
         <p v-if="!display.length" class="empty">{{ t.blog.empty }}</p>
+      </div>
+
+      <div class="subscribe-block reveal">
+        <div class="subscribe-label">{{ t.blog.subscriberLabel }}</div>
+        <h2 class="subscribe-title">{{ t.blog.subscribeTitle }}</h2>
+        <p class="subscribe-sub">{{ t.blog.subscribeSub }}</p>
+        <p v-if="subState === 'success'" class="subscribe-success">{{ t.blog.subscribeSuccess }}</p>
+        <form v-else class="subscribe-form" @submit.prevent="handleSubscribe">
+          <input
+            v-model="subEmail"
+            type="email"
+            :placeholder="t.blog.subscribePlaceholder"
+            required
+            class="subscribe-input"
+          />
+          <button type="submit" class="subscribe-btn" :disabled="subState === 'loading'">
+            {{ subState === 'loading' ? '...' : t.blog.subscribeBtn }}
+          </button>
+        </form>
+        <p class="subscribe-privacy">{{ t.blog.subscribePrivacy }}</p>
+        <p v-if="subState === 'error'" class="subscribe-error">{{ t.blog.subscribeError }}</p>
       </div>
     </main>
     <AppFooter />
@@ -99,8 +133,32 @@ const display = computed(() => (posts.value ?? []).map(p => ({
 
 .empty { font-family: var(--mono); font-size: 0.65rem; color: var(--text); letter-spacing: 0.1em; padding: 2rem 0; border-top: 1px solid var(--border); }
 
+.subscribe-block { margin-top: 6rem; padding-top: 4rem; border-top: 1px solid var(--border); }
+
+.subscribe-label { font-family: var(--mono); font-size: 0.6rem; color: var(--accent); letter-spacing: 0.25em; text-transform: uppercase; margin-bottom: 1rem; }
+
+.subscribe-title { font-family: var(--display); font-size: clamp(1.8rem, 4vw, 3rem); color: var(--white); font-weight: 900; line-height: 1; margin-bottom: 1rem; }
+
+.subscribe-sub { font-size: 0.85rem; line-height: 1.7; margin-bottom: 2rem; max-width: 480px; }
+
+.subscribe-form { display: flex; gap: 0; max-width: 480px; }
+
+.subscribe-input { flex: 1; background: var(--surface); border: 1px solid var(--border); border-right: none; outline: none; font-family: var(--body); font-size: 0.9rem; color: var(--white); padding: 1rem 1.2rem; transition: border-color 0.2s; }
+.subscribe-input:focus { border-color: var(--accent); }
+
+.subscribe-btn { background: var(--accent); border: none; cursor: pointer; font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--white); padding: 1rem 1.5rem; white-space: nowrap; transition: opacity 0.2s; }
+.subscribe-btn:hover { opacity: 0.85; }
+.subscribe-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.subscribe-success { font-size: 0.85rem; color: var(--white); line-height: 1.7; }
+.subscribe-privacy { font-family: var(--mono); font-size: 0.6rem; color: var(--text); letter-spacing: 0.05em; margin-top: 0.75rem; line-height: 1.6; opacity: 0.7; }
+.subscribe-error { font-family: var(--mono); font-size: 0.7rem; color: var(--accent); margin-top: 0.75rem; }
+
 @media (max-width: 768px) {
   .blog-page { padding: 8rem 1.5rem 4rem; }
   .post-card { grid-template-columns: 1fr; gap: 0.75rem; padding: 1.5rem 0; }
+  .subscribe-form { flex-direction: column; }
+  .subscribe-input { border-right: 1px solid var(--border); border-bottom: none; }
+  .subscribe-btn { width: 100%; }
 }
 </style>

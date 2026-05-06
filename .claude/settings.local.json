@@ -39,7 +39,15 @@
       "Bash(curl -s http://localhost:3000/about)",
       "Bash(curl -s http://localhost:3000/api/config)",
       "Bash(curl -sv http://localhost:3000/about)",
-      "Bash(curl -s http://localhost:3000/admin)"
+      "Bash(curl -s http://localhost:3000/admin)",
+      "Bash(curl -s -X POST http://localhost:3000/api/contact -H 'Content-Type: application/json' -d '{\"name\":\"Test Niels\",\"email\":\"test@example.com\",\"message\":\"Dit is een testbericht vanuit Claude Code.\"}')",
+      "Bash(python3 -m json.tool)",
+      "Bash(curl -s -X POST http://localhost:3000/api/subscribe -H \"Content-Type: application/json\" -d '{\"email\":\"test@example.com\"}')",
+      "Bash(curl -s \"http://localhost:3000/api/unsubscribe?token=b2b0a7f7-199c-4ffc-9209-f97346f3dc43\")",
+      "Bash(curl -s -X POST http://localhost:3000/api/subscribe -H 'Content-Type: application/json' -d '{\"email\":\"nielsmaes.test@gmail.com\"}')",
+      "Bash(curl *)",
+      "Bash(kill 54936)",
+      "Bash(kill 55441 55440 55437 55327 55311 55281 35143)"
     ]
   }
 }

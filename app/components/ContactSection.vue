@@ -1,7 +1,23 @@
 <script setup lang="ts">
 const { t } = useLocale()
 const form = reactive({ name: '', email: '', message: '' })
-function handleSubmit() { console.log('Form submitted:', form) }
+const state = ref<'idle' | 'loading' | 'success' | 'error'>('idle')
+const errorMsg = ref('')
+
+async function handleSubmit() {
+  state.value = 'loading'
+  errorMsg.value = ''
+  try {
+    await $fetch('/api/contact', { method: 'POST', body: { ...form } })
+    state.value = 'success'
+    form.name = ''
+    form.email = ''
+    form.message = ''
+  } catch (e: any) {
+    errorMsg.value = e?.data?.message ?? 'Er ging iets mis, probeer het opnieuw.'
+    state.value = 'error'
+  }
+}
 </script>
 
 <template>
@@ -16,20 +32,26 @@ function handleSubmit() { console.log('Form submitted:', form) }
       </div>
 
       <div class="reveal">
-        <form @submit.prevent="handleSubmit">
+        <div v-if="state === 'success'" class="form-success">
+          <p>{{ t.contact.success }}</p>
+        </div>
+        <form v-else @submit.prevent="handleSubmit">
           <div class="form-row">
             <label for="contact-name">{{ t.contact.labelName }}</label>
-            <input id="contact-name" v-model="form.name" type="text" :placeholder="t.contact.placeholderName" />
+            <input id="contact-name" v-model="form.name" type="text" :placeholder="t.contact.placeholderName" required />
           </div>
           <div class="form-row">
             <label for="contact-email">{{ t.contact.labelEmail }}</label>
-            <input id="contact-email" v-model="form.email" type="email" placeholder="email@example.com" />
+            <input id="contact-email" v-model="form.email" type="email" placeholder="email@example.com" required />
           </div>
           <div class="form-row">
             <label for="contact-message">{{ t.contact.labelMessage }}</label>
-            <textarea id="contact-message" v-model="form.message" :placeholder="t.contact.placeholderMessage" />
+            <textarea id="contact-message" v-model="form.message" :placeholder="t.contact.placeholderMessage" required />
           </div>
-          <button type="submit" class="form-btn">{{ t.contact.submit }}</button>
+          <p v-if="state === 'error'" class="form-error">{{ errorMsg }}</p>
+          <button type="submit" class="form-btn" :disabled="state === 'loading'">
+            {{ state === 'loading' ? '...' : t.contact.submit }}
+          </button>
         </form>
       </div>
     </div>
@@ -58,6 +80,11 @@ function handleSubmit() { console.log('Form submitted:', form) }
 
 .form-btn { width: 100%; background: var(--accent); border: none; cursor: pointer; font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--white); padding: 1.2rem; transition: opacity 0.2s; }
 .form-btn:hover { opacity: 0.85; }
+.form-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.form-error { font-family: var(--mono); font-size: 0.75rem; color: var(--accent); margin-bottom: 1rem; }
+
+.form-success { font-family: var(--body); font-size: 0.95rem; color: var(--white); line-height: 1.8; padding: 2rem 0; }
 
 @media (max-width: 768px) {
   #contact { padding: 4rem 1.5rem; }
